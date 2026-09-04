@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Control Center - The Bandhan Project (tbp;)</title>
+  
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="assets/images/favicon.png" type="image/png">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- LineIcons & Bootstrap -->
+  <link rel="stylesheet" href="assets/css/LineIcons.2.0.css">
+  <link rel="stylesheet" href="assets/css/bootstrap.4.5.2.min.css">
+  
+  <!-- Custom Admin Styles -->
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+
+  <!-- =========================================================================
+       1. AUTH SCREEN (LOGIN REQUIRED)
+       ========================================================================= -->
+  <div id="auth-screen" class="auth-wrapper">
+    <div class="auth-card">
+      <img src="assets/images/logo.png" alt="The Bandhan Project" class="auth-logo">
+      <h2 class="auth-title">Admin Access Portal</h2>
+      <p class="auth-subtitle">Enter your admin passcode to access real-time CMS controls for The Bandhan Project.</p>
+
+      <div id="login-error" class="alert alert-danger py-2 mb-3" style="display:none; font-size:13px;"></div>
+
+      <form id="admin-login-form" class="auth-form">
+        <div class="form-group">
+          <label for="login-password"><i class="lni lni-lock"></i> Master Passcode</label>
+          <input type="password" id="login-password" class="form-control" placeholder="Enter admin passcode (default: admin123)" required autofocus>
+        </div>
+        <button type="submit" class="btn-admin-primary">
+          <i class="lni lni-key"></i> Unlock Admin Panel
+        </button>
+      </form>
+
+      <div class="auth-footer-links">
+        <a href="index.html"><i class="lni lni-arrow-left"></i> Return to Live Website</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       2. MAIN ADMIN DASHBOARD & CMS
+       ========================================================================= -->
+  <div id="admin-panel" class="admin-layout" style="display:none;">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <img src="assets/images/logo.png" alt="tbp;">
+        <div class="title-wrap">
+          <h3>The Bandhan Project</h3>
+          <span>Admin CMS Control</span>
+        </div>
+      </div>
+
+      <div class="sidebar-nav">
+        <div class="nav-category">Content Management</div>
+
+        <button type="button" class="sidebar-nav-item active" data-tab="events">
+          <i class="lni lni-calendar"></i>
+          <span>Jigsaw Past Events</span>
+        </button>
+
+        <button type="button" class="sidebar-nav-item" data-tab="hero">
+          <i class="lni lni-layout"></i>
+          <span>Hero & Branding</span>
+        </button>
+
+        <button type="button" class="sidebar-nav-item" data-tab="about">
+          <i class="lni lni-stats-up"></i>
+          <span>About & Stats</span>
+        </button>
+
+        <button type="button" class="sidebar-nav-item" data-tab="yknot">
+          <i class="lni lni-rocket"></i>
+          <span>yKnot Project</span>
+        </button>
+
+        <button type="button" class="sidebar-nav-item" data-tab="founder">
+          <i class="lni lni-quotation"></i>
+          <span>Founder's Note</span>
+        </button>
+
+        <button type="button" class="sidebar-nav-item" data-tab="gallery">
+          <i class="lni lni-gallery"></i>
+          <span>Moments & Gallery</span>
+        </button>
+
+        <button type="button" class="sidebar-nav-item" data-tab="contact">
+          <i class="lni lni-phone"></i>
+          <span>Contact & Footer</span>
+        </button>
+
+        <div class="nav-category mt-3">Administration</div>
+
+        <button type="button" class="sidebar-nav-item" data-tab="settings">
+          <i class="lni lni-cog"></i>
+          <span>Security & Backups</span>
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <a href="#" id="logout-btn" class="sidebar-footer-btn">
+          <i class="lni lni-power-switch"></i> Log Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <!-- Topbar Header -->
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <h2 class="topbar-page-title" id="topbar-page-title">Jigsaw Events Archive</h2>
+        </div>
+        <div class="topbar-right">
+          <a href="index.html" target="_blank" class="btn-view-site">
+            <i class="lni lni-eye"></i> View Live Website
+          </a>
+        </div>
+      </header>
+
+      <!-- Content Container -->
+      <div class="admin-content">
+
+        <!-- ===================================================================
+             TAB 1: EVENTS MANAGER (CRUD + MULTI-PHOTO)
+             =================================================================== -->
+        <div id="tab-events" class="admin-tab-pane">
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">Manage Past Events & Conclaves</h3>
+                <p class="content-card-desc">Add, edit, delete, and manage 3-4 photo sets and recap stories for each event held by The Bandhan Project.</p>
+              </div>
+              <button type="button" class="btn-admin-primary" id="btn-add-event" style="width:auto; padding: 0 20px; height: 40px; font-size: 13.5px;">
+                <i class="lni lni-plus"></i> Add Past Event
+              </button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Photos</th>
+                    <th>Title & Category</th>
+                    <th>Date Held</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="events-table-body">
+                  <!-- Injected via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             TAB 2: HERO & BRANDING
+             =================================================================== -->
+        <div id="tab-hero" class="admin-tab-pane" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">Hero Section & Brand Identity</h3>
+                <p class="content-card-desc">Configure the main headline, tagline, background visuals, and action buttons.</p>
+              </div>
+            </div>
+
+            <form id="hero-brand-form">
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="hero-brand-name">Brand Full Name</label>
+                  <input type="text" id="hero-brand-name" class="admin-form-control" placeholder="The Bandhan Project" required>
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="hero-brand-short">Brand Short Name</label>
+                  <input type="text" id="hero-brand-short" class="admin-form-control" placeholder="tbp;" required>
+                </div>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="hero-title-input">Hero Main Title (HTML supported for &lt;span&gt; highlight)</label>
+                <input type="text" id="hero-title-input" class="admin-form-control" required>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="hero-subtitle-input">Hero Subtitle / Narrative</label>
+                <textarea id="hero-subtitle-input" class="admin-form-control" required></textarea>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="hero-btn-text">Primary Button Text</label>
+                  <input type="text" id="hero-btn-text" class="admin-form-control" required>
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="hero-btn-link">Primary Button Link</label>
+                  <input type="text" id="hero-btn-link" class="admin-form-control" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="hero-sec-btn-text">Secondary Button Text</label>
+                  <input type="text" id="hero-sec-btn-text" class="admin-form-control" required>
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="hero-sec-btn-link">Secondary Button Link</label>
+                  <input type="text" id="hero-sec-btn-link" class="admin-form-control" required>
+                </div>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="hero-bg-img">Hero Background Image</label>
+                <div class="d-flex align-items-center gap-3 mb-2">
+                  <img id="hero-bg-preview" src="assets/images/hero-area.jpg" style="height:70px; width:120px; object-fit:cover; border-radius:8px; border:1px solid #cbd5e1;">
+                  <div style="flex-grow:1;">
+                    <input type="file" accept="image/*" onchange="handleImageUpload(this, 'hero-bg-img', 'hero-bg-preview')" class="form-control-file" style="font-size:13px;">
+                  </div>
+                </div>
+                <input type="text" id="hero-bg-img" class="admin-form-control" placeholder="assets/images/hero-area.jpg">
+              </div>
+
+              <button type="submit" class="btn-save-section">
+                <i class="lni lni-checkmark"></i> Save Hero Changes
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             TAB 3: ABOUT & STATS
+             =================================================================== -->
+        <div id="tab-about" class="admin-tab-pane" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">About Section & Live Impact Counters</h3>
+                <p class="content-card-desc">Update the story, vision, and dynamic statistics shown in the numbers grid.</p>
+              </div>
+            </div>
+
+            <form id="about-stats-form">
+              <div class="admin-form-group">
+                <label>About Section Visual Image</label>
+                <div class="d-flex align-items-center gap-3 mb-2">
+                  <img id="about-img-preview" src="assets/images/about_image.jpg" style="height:70px; width:100px; object-fit:cover; border-radius:8px; border:1px solid #cbd5e1;">
+                  <div style="flex-grow:1;">
+                    <input type="file" accept="image/*" onchange="handleImageUpload(this, 'about-image-url', 'about-img-preview')" class="form-control-file" style="font-size:13px;">
+                  </div>
+                </div>
+                <input type="text" id="about-image-url" class="admin-form-control">
+              </div>
+
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="about-title-input">About Heading</label>
+                  <input type="text" id="about-title-input" class="admin-form-control" required>
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="about-subtitle-input">About Subtitle Highlight</label>
+                  <input type="text" id="about-subtitle-input" class="admin-form-control" required>
+                </div>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="about-desc-input">About Narrative / Description</label>
+                <textarea id="about-desc-input" class="admin-form-control" required></textarea>
+              </div>
+
+              <h4 class="mt-4 mb-3" style="font-size:15px; font-weight:700;">Vision &amp; Mission</h4>
+
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="about-vision-title-input">Vision Heading</label>
+                  <input type="text" id="about-vision-title-input" class="admin-form-control" placeholder="Our Vision">
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="about-mission-title-input">Mission Heading</label>
+                  <input type="text" id="about-mission-title-input" class="admin-form-control" placeholder="Our Mission">
+                </div>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="about-vision-input">Vision Statement</label>
+                <textarea id="about-vision-input" class="admin-form-control"></textarea>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="about-mission-input">Mission Statement</label>
+                <textarea id="about-mission-input" class="admin-form-control"></textarea>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="about-btn-text">CTA Button Text</label>
+                  <input type="text" id="about-btn-text" class="admin-form-control" required>
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="about-btn-link">CTA Button Link</label>
+                  <input type="text" id="about-btn-link" class="admin-form-control" required>
+                </div>
+              </div>
+
+              <h4 class="mt-4 mb-3" style="font-size:15px; font-weight:700;">Impact Statistics Counters (4 Boxes)</h4>
+              
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label>Stat 1 Number</label>
+                  <input type="text" id="stat-count-0" class="admin-form-control" placeholder="1250" required>
+                  <label class="mt-2">Stat 1 Label</label>
+                  <input type="text" id="stat-label-0" class="admin-form-control" placeholder="Community Members" required>
+                </div>
+                <div class="form-col admin-form-group">
+                  <label>Stat 2 Number</label>
+                  <input type="text" id="stat-count-1" class="admin-form-control" placeholder="48" required>
+                  <label class="mt-2">Stat 2 Label</label>
+                  <input type="text" id="stat-label-1" class="admin-form-control" placeholder="Projects & Drives" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label>Stat 3 Number</label>
+                  <input type="text" id="stat-count-2" class="admin-form-control" placeholder="18" required>
+                  <label class="mt-2">Stat 3 Label</label>
+                  <input type="text" id="stat-label-2" class="admin-form-control" placeholder="Partner Chapters" required>
+                </div>
+                <div class="form-col admin-form-group">
+                  <label>Stat 4 Number</label>
+                  <input type="text" id="stat-count-3" class="admin-form-control" placeholder="100" required>
+                  <label class="mt-2">Stat 4 Label</label>
+                  <input type="text" id="stat-label-3" class="admin-form-control" placeholder="Impact Driven" required>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-save-section">
+                <i class="lni lni-checkmark"></i> Save About & Stats
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             TAB: yKNOT — FIRST IMPACT PROJECT
+             =================================================================== -->
+        <div id="tab-yknot" class="admin-tab-pane" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">yKnot — First Impact Project</h3>
+                <p class="content-card-desc">Manage the showcase block shown right below the About section. Every field here — image, text, and the store button — updates the live website instantly.</p>
+              </div>
+            </div>
+
+            <form id="yknot-form">
+              <div class="form-check mb-3">
+                <input type="checkbox" id="yknot-active" class="form-check-input" checked>
+                <label class="form-check-label" for="yknot-active"><strong>Show this section on the website</strong></label>
+              </div>
+
+              <div class="admin-form-group">
+                <label>Project Image</label>
+                <div class="d-flex align-items-center gap-3 mb-2">
+                  <img id="yknot-img-preview" src="assets/images/about_image.jpg" style="height:70px; width:110px; object-fit:cover; border-radius:8px; border:1px solid #cbd5e1;">
+                  <div style="flex-grow:1;">
+                    <input type="file" accept="image/*" onchange="handleImageUpload(this, 'yknot-image-url', 'yknot-img-preview')" class="form-control-file" style="font-size:13px;">
+                  </div>
+                </div>
+                <input type="text" id="yknot-image-url" class="admin-form-control" placeholder="assets/images/about_image.jpg">
+              </div>
+
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="yknot-badge-input">Section Badge Tag</label>
+                  <input type="text" id="yknot-badge-input" class="admin-form-control" placeholder="Our First Impact Project">
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="yknot-title-input">Project Name / Title</label>
+                  <input type="text" id="yknot-title-input" class="admin-form-control" placeholder="yKnot">
+                </div>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="yknot-subtitle-input">Short Tagline</label>
+                <input type="text" id="yknot-subtitle-input" class="admin-form-control" placeholder="Say &ldquo;why knot?&rdquo; — and turn possibility into action.">
+              </div>
+
+              <div class="admin-form-group">
+                <label for="yknot-desc-input">About yKnot (Separate paragraphs with a blank line)</label>
+                <textarea id="yknot-desc-input" class="admin-form-control" style="min-height: 150px;"></textarea>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="yknot-btn-text">Button Text</label>
+                  <input type="text" id="yknot-btn-text" class="admin-form-control" placeholder="Visit the yKnot Store">
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="yknot-btn-link">Button Link (URL)</label>
+                  <input type="text" id="yknot-btn-link" class="admin-form-control" placeholder="https://www.yknotstore.com">
+                </div>
+              </div>
+
+              <button type="submit" class="btn-save-section">
+                <i class="lni lni-checkmark"></i> Save yKnot Project
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             TAB 4: FOUNDER'S NOTE
+             =================================================================== -->
+        <div id="tab-founder" class="admin-tab-pane" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">Founder's Note & Visionary Letter</h3>
+                <p class="content-card-desc">Edit the message from the founder, portrait photo, signature, and featured quote.</p>
+              </div>
+            </div>
+
+            <form id="founder-form">
+              <div class="admin-form-group">
+                <label>Founder Portrait Photo</label>
+                <div class="d-flex align-items-center gap-4 mb-3 p-3 rounded" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                  <img id="founder-img-preview" src="assets/images/about_image.jpg" style="width:105px; height:105px; object-fit:cover; border-radius:12px; border:3px solid #ffffff; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                  <div style="flex-grow:1;">
+                    <label class="btn-admin-primary mb-1" style="width:auto; padding:7px 16px; height:auto; font-size:13px; cursor:pointer;">
+                      <i class="lni lni-upload"></i> Upload New Photo
+                      <input type="file" accept="image/*" onchange="handleImageUpload(this, 'founder-img-url', 'founder-img-preview')" style="display:none;">
+                    </label>
+                    <small class="text-muted d-block mt-1">Select any JPG/PNG image. It will be optimized and saved live.</small>
+                  </div>
+                </div>
+                <input type="hidden" id="founder-img-url" value="assets/images/about_image.jpg">
+              </div>
+
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="founder-badge-input">Section Badge Tag</label>
+                  <input type="text" id="founder-badge-input" class="admin-form-control" placeholder="A Word from Our Founder" required>
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="founder-quote-input">Main Quote Banner</label>
+                  <input type="text" id="founder-quote-input" class="admin-form-control" required>
+                </div>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="founder-paras-input">Founder's Message / Letter (Separate paragraphs with a blank line)</label>
+                <textarea id="founder-paras-input" class="admin-form-control" style="min-height: 180px;" required></textarea>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="founder-name-input">Founder Name / Signoff</label>
+                  <input type="text" id="founder-name-input" class="admin-form-control" placeholder="Founder & Visionary" required>
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="founder-title-input">Founder Designation</label>
+                  <input type="text" id="founder-title-input" class="admin-form-control" placeholder="The Bandhan Project (tbp;)" required>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-save-section">
+                <i class="lni lni-checkmark"></i> Save Founder's Note & Photo
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             TAB 5: GALLERY & HIGHLIGHTS
+             =================================================================== -->
+        <div id="tab-gallery" class="admin-tab-pane" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">Moments & Highlights Gallery</h3>
+                <p class="content-card-desc">Add and manage photos highlighting recent community drives, workshops, and gatherings.</p>
+              </div>
+            </div>
+
+            <!-- Add Photo Form -->
+            <form id="add-gallery-form" class="p-3 mb-4 rounded" style="background:#f8fafc; border: 1px dashed #cbd5e1;">
+              <h5 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">+ Add New Photo to Gallery</h5>
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="gallery-new-title">Photo Title</label>
+                  <input type="text" id="gallery-new-title" class="admin-form-control" placeholder="Youth Leadership Workshop" required>
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="gallery-new-subtitle">Subtitle / Category</label>
+                  <input type="text" id="gallery-new-subtitle" class="admin-form-control" placeholder="Community Drive" required>
+                </div>
+              </div>
+              <div class="admin-form-group">
+                <label>Photo Upload</label>
+                <div class="d-flex align-items-center gap-3 mb-2">
+                  <img id="gallery-new-preview" src="assets/images/blog-1.jpg" style="height:60px; width:90px; object-fit:cover; border-radius:6px; border:1px solid #cbd5e1;">
+                  <input type="file" accept="image/*" onchange="handleImageUpload(this, 'gallery-new-img', 'gallery-new-preview')" class="form-control-file" style="font-size:13px;">
+                </div>
+                <input type="text" id="gallery-new-img" class="admin-form-control" placeholder="assets/images/blog-1.jpg" required>
+              </div>
+              <button type="submit" class="btn-admin-primary" style="width: auto; padding: 0 18px; height: 36px; font-size: 13px;">
+                <i class="lni lni-plus"></i> Add Photo
+              </button>
+            </form>
+
+            <!-- Gallery Grid -->
+            <div class="row" id="admin-gallery-list">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             TAB 6: CONTACT & FOOTER
+             =================================================================== -->
+        <div id="tab-contact" class="admin-tab-pane" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">Contact Channels & Footer Configuration</h3>
+                <p class="content-card-desc">Update official contact emails, phone numbers, social media handles, and footer copyright.</p>
+              </div>
+            </div>
+
+            <form id="contact-footer-form">
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="contact-email-input">Official Contact Email</label>
+                  <input type="email" id="contact-email-input" class="admin-form-control" required>
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="contact-phone-input">Official Phone / WhatsApp</label>
+                  <input type="text" id="contact-phone-input" class="admin-form-control" required>
+                </div>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="contact-address-input">Headquarters / Location Address</label>
+                <input type="text" id="contact-address-input" class="admin-form-control" required>
+              </div>
+
+              <h4 class="mt-4 mb-3" style="font-size:15px; font-weight:700;">Social Media Links</h4>
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="contact-fb-input"><i class="lni lni-facebook"></i> Facebook Page URL</label>
+                  <input type="url" id="contact-fb-input" class="admin-form-control">
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="contact-twitter-input"><i class="lni lni-twitter"></i> Twitter / X URL</label>
+                  <input type="url" id="contact-twitter-input" class="admin-form-control">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="contact-insta-input"><i class="lni lni-instagram"></i> Instagram Handle URL</label>
+                  <input type="url" id="contact-insta-input" class="admin-form-control">
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="contact-linkedin-input"><i class="lni lni-linkedin"></i> LinkedIn Company URL</label>
+                  <input type="url" id="contact-linkedin-input" class="admin-form-control">
+                </div>
+              </div>
+
+              <h4 class="mt-4 mb-3" style="font-size:15px; font-weight:700;">Footer Text & Copyright</h4>
+              <div class="admin-form-group">
+                <label for="footer-about-input">Footer Bio / Summary</label>
+                <textarea id="footer-about-input" class="admin-form-control" required></textarea>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="footer-copyright-input">Footer Copyright Notice</label>
+                <input type="text" id="footer-copyright-input" class="admin-form-control" required>
+              </div>
+
+              <button type="submit" class="btn-save-section">
+                <i class="lni lni-checkmark"></i> Save Contact & Footer
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             TAB 7: SECURITY & BACKUPS
+             =================================================================== -->
+        <div id="tab-settings" class="admin-tab-pane" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">Security & Passcode Settings</h3>
+                <p class="content-card-desc">Change your master admin passcode to protect access to the control panel.</p>
+              </div>
+            </div>
+
+            <form id="change-password-form">
+              <div class="admin-form-group" style="max-width: 380px;">
+                <label for="new-admin-password">New Admin Passcode</label>
+                <input type="password" id="new-admin-password" class="admin-form-control" placeholder="Enter new password" required>
+              </div>
+              <button type="submit" class="btn-admin-primary" style="width:auto; padding: 0 22px; height:40px; font-size:13.5px;">
+                <i class="lni lni-lock"></i> Update Passcode
+              </button>
+            </form>
+          </div>
+
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">Data Backups, Export & Restore</h3>
+                <p class="content-card-desc">Download a complete JSON snapshot of the entire website or restore from a backup file.</p>
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-3 align-items-center mb-3">
+              <button type="button" id="btn-export-json" class="btn-admin-primary mr-3 mb-2" style="width:auto; padding: 0 20px; height:42px; font-size:13.5px;">
+                <i class="lni lni-download"></i> Export Data Backup (JSON)
+              </button>
+
+              <label class="btn-secondary mb-2 mr-3" style="margin: 0; height: 42px; display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
+                <i class="lni lni-upload"></i> Restore from JSON File
+                <input type="file" id="import-json-file" accept=".json" style="display:none;">
+              </label>
+
+              <button type="button" id="btn-reset-default" class="btn-secondary mb-2" style="color: #ef4444; border-color: #fecaca; background: #fff5f5; height: 42px;">
+                <i class="lni lni-reload"></i> Reset to Factory Preset
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- admin-content -->
+    </main>
+  </div>
+
+  <!-- =========================================================================
+       3. PAST EVENT MODAL (ADD / EDIT - MULTI-PHOTO SUPPORT)
+       ========================================================================= -->
+  <div id="event-modal" class="admin-modal-backdrop">
+    <div class="admin-modal">
+      <div class="admin-modal-header">
+        <h4 id="modal-title-text">Add Past Event</h4>
+        <button type="button" class="admin-modal-close"><i class="lni lni-close"></i></button>
+      </div>
+
+      <form id="event-form">
+        <div class="admin-modal-body">
+          <input type="hidden" id="modal-event-id">
+
+          <div class="admin-form-group">
+            <label for="modal-event-title">Event Title</label>
+            <input type="text" id="modal-event-title" class="admin-form-control" placeholder="e.g. Annual Youth Leadership Summit" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-col admin-form-group">
+              <label for="modal-event-category">Category / Tag</label>
+              <input type="text" id="modal-event-category" class="admin-form-control" placeholder="e.g. Summit, Workshop, Conclave, Drive" required>
+            </div>
+            <div class="form-col admin-form-group">
+              <label for="modal-event-location">Venue / Location</label>
+              <input type="text" id="modal-event-location" class="admin-form-control" placeholder="e.g. Main Auditorium & Hybrid Stream">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-col admin-form-group">
+              <label for="modal-event-date">Date Held</label>
+              <input type="text" id="modal-event-date" class="admin-form-control" placeholder="e.g. October 18, 2025" required>
+            </div>
+            <div class="form-col admin-form-group">
+              <label for="modal-event-time">Time / Duration</label>
+              <input type="text" id="modal-event-time" class="admin-form-control" placeholder="e.g. Full Day Conclave">
+            </div>
+          </div>
+
+          <!-- Event Photo Slots (3 to 4 photos) -->
+          <div class="admin-form-group">
+            <label><strong>Event Photo Highlights (Up to 4 images with live preview)</strong></label>
+            <small class="text-muted d-block mb-2">Photo 1 is the main puzzle cover. Photos 2-4 appear in the expanded event gallery strip.</small>
+            
+            <div class="event-photo-grid">
+              <!-- Slot 1 (Cover) -->
+              <div class="event-photo-slot">
+                <img id="event-slot-preview-0" src="assets/images/hero-area.jpg" class="event-photo-thumb">
+                <label>
+                  <i class="lni lni-upload"></i> Photo 1 (Cover)
+                  <input type="file" accept="image/*" onchange="handleImageUpload(this, 'event-img-url-0', 'event-slot-preview-0')" style="display:none;">
+                </label>
+                <input type="hidden" id="event-img-url-0" value="assets/images/hero-area.jpg">
+              </div>
+
+              <!-- Slot 2 -->
+              <div class="event-photo-slot">
+                <img id="event-slot-preview-1" src="assets/images/blog-1.jpg" class="event-photo-thumb">
+                <label>
+                  <i class="lni lni-upload"></i> Photo 2
+                  <input type="file" accept="image/*" onchange="handleImageUpload(this, 'event-img-url-1', 'event-slot-preview-1')" style="display:none;">
+                </label>
+                <input type="hidden" id="event-img-url-1" value="assets/images/blog-1.jpg">
+              </div>
+
+              <!-- Slot 3 -->
+              <div class="event-photo-slot">
+                <img id="event-slot-preview-2" src="assets/images/blog-2.jpg" class="event-photo-thumb">
+                <label>
+                  <i class="lni lni-upload"></i> Photo 3
+                  <input type="file" accept="image/*" onchange="handleImageUpload(this, 'event-img-url-2', 'event-slot-preview-2')" style="display:none;">
+                </label>
+                <input type="hidden" id="event-img-url-2" value="assets/images/blog-2.jpg">
+              </div>
+
+              <!-- Slot 4 -->
+              <div class="event-photo-slot">
+                <img id="event-slot-preview-3" src="assets/images/blog-3.jpg" class="event-photo-thumb">
+                <label>
+                  <i class="lni lni-upload"></i> Photo 4
+                  <input type="file" accept="image/*" onchange="handleImageUpload(this, 'event-img-url-3', 'event-slot-preview-3')" style="display:none;">
+                </label>
+                <input type="hidden" id="event-img-url-3" value="assets/images/blog-3.jpg">
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-form-group">
+            <label for="modal-event-desc">Event Story, Recap & Impact Highlights (Shown when card is expanded)</label>
+            <textarea id="modal-event-desc" class="admin-form-control" placeholder="Describe the event, keynote highlights, attendee stories, and outcomes..."></textarea>
+          </div>
+
+          <div class="form-check mt-3">
+            <input type="checkbox" id="modal-event-active" class="form-check-input" checked>
+            <label class="form-check-label" for="modal-event-active"><strong>Publish on Jigsaw Board (Active)</strong></label>
+          </div>
+        </div>
+
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-secondary modal-cancel">Cancel</button>
+          <button type="submit" class="btn-admin-primary" style="width: auto; padding: 0 24px;">
+            <i class="lni lni-checkmark"></i> Save Event
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/js/site-data.js"></script>
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>

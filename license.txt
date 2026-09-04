@@ -1,0 +1,5 @@
+The Bandhan Project (tbp;)
+Copyright (c) 2026 The Bandhan Project. All rights reserved.
+
+This software and associated documentation files (the "Software") are the proprietary property of The Bandhan Project.
+Permission is hereby granted for use, modification, and deployment exclusively for The Bandhan Project and authorized stakeholders.
