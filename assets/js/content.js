@@ -69,6 +69,12 @@ window.TBP_PUBLISHED_CONTENT = {
     "gallery": true,
     "contact": true
   },
+  "whatsapp": {
+    "enabled": true,
+    "label": "Join our WhatsApp Group",
+    "url": "https://chat.whatsapp.com/REPLACE-WITH-YOUR-GROUP-INVITE-LINK",
+    "color": "#25D366"
+  },
   "hero": {
     "title": "Building Bonds, Empowering Communities — <span>lean into Goodness</span>",
     "subtitle": "Welcome to The Bandhan Project — an inspiring initiative founded by Harsh Bhayani dedicated to meaningful connections, impactful community drives, networking summits, and youth empowerment.",
@@ -134,6 +140,7 @@ window.TBP_PUBLISHED_CONTENT = {
       "time": "Full Day Conclave",
       "location": "Main Auditorium & Hybrid Stream",
       "description": "A landmark gathering bringing together passionate youth changemakers, mentors, and community innovators. The summit featured interactive keynotes, panel discussions on social entrepreneurship, and hands-on collaborative problem-solving workshops.",
+      "body": "The Annual Youth Leadership & Impact Summit brought together passionate young changemakers, seasoned mentors, and community innovators for a full day of learning and collaboration.\n\n## Highlights\n\n- Interactive keynotes on purpose-driven leadership\n- Panel discussions on social entrepreneurship\n- Hands-on, collaborative problem-solving workshops\n\nParticipants left with new partnerships, concrete action plans, and a renewed commitment to lean into Goodness in their own communities.",
       "images": [
         "assets/images/hero-area.jpg",
         "assets/images/blog-1.jpg",
@@ -150,6 +157,7 @@ window.TBP_PUBLISHED_CONTENT = {
       "time": "Afternoon Session",
       "location": "Innovation Hub, Hall B",
       "description": "An impactful grassroots initiative focused on practical skill building, digital literacy, and peer-to-peer mentoring. Over 150 participants collaborated on real-world projects and community action plans.",
+      "body": "This grassroots workshop put practical skills directly into the hands of the community. Over 150 participants spent the afternoon learning, teaching, and building together.\n\n## What we covered\n\n- Digital literacy fundamentals\n- Peer-to-peer mentoring circles\n- Real-world project sprints with community action plans\n\nSeveral of the plans drafted that day have since grown into ongoing neighbourhood initiatives.",
       "images": [
         "assets/images/blog-1.jpg",
         "assets/images/blog-2.jpg",
@@ -166,6 +174,7 @@ window.TBP_PUBLISHED_CONTENT = {
       "time": "Evening Conclave",
       "location": "Grand Convention Center",
       "description": "An inspiring evening dedicated to forging meaningful partnerships across diverse social sectors. Leaders, volunteers, and student chapters connected to share insights and launch new collaborative initiatives.",
+      "body": "An evening built entirely around connection. Leaders, volunteers, and student chapters from across the region came together to share what they're working on and to find their next collaborators.\n\n## The format\n\n- Rapid introductions across sectors\n- A moderated panel on cross-sector partnership\n- Open networking over the rest of the evening\n\nSeveral new joint initiatives were launched on the spot.",
       "images": [
         "assets/images/blog-2.jpg",
         "assets/images/blog-3.jpg",
@@ -173,6 +182,17 @@ window.TBP_PUBLISHED_CONTENT = {
         "assets/images/blog-1.jpg"
       ],
       "active": true
+    }
+  ],
+  "pages": [
+    {
+      "id": "page_sample_volunteer",
+      "slug": "volunteer",
+      "title": "Volunteer With Us",
+      "navLabel": "Volunteer",
+      "showInNav": false,
+      "heroImage": "assets/images/hero-area.jpg",
+      "body": "The Bandhan Project runs on people who lean into Goodness. If you have time, skills, or energy to give, there is a place for you here.\n\n## Ways to help\n\n- Join a community drive\n- Mentor a youth leader\n- Help plan or run an event\n- Offer a professional skill (design, writing, photography, logistics)\n\nWrite to us at **contact@thebandhanproject.org** and tell us a little about what you'd like to do.\n\n*(This is a sample page. Edit or delete it in the Admin panel under \"Custom Pages\".)*"
     }
   ],
   "founderNote": {

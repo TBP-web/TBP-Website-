@@ -6,13 +6,15 @@ $(function() {
         $('.preloader').delay(400).fadeOut(400);
     });
     
-    //===== Sticky Navbar
+    //===== Sticky Navbar (only the transparent homepage navbar; sub-pages use
+    //      the always-solid .header_navbar--page and must not become fixed)
     $(window).on('scroll', function (event) {
-        var scroll = $(window).scrollTop();
-        if (scroll < 20) {
-            $(".header_navbar").removeClass("sticky");
+        var $nav = $(".header_navbar:not(.header_navbar--page)");
+        if (!$nav.length) return;
+        if ($(window).scrollTop() < 20) {
+            $nav.removeClass("sticky");
         } else {
-            $(".header_navbar").addClass("sticky");
+            $nav.addClass("sticky");
         }
     });
     

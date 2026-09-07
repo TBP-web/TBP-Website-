@@ -1121,7 +1121,7 @@ p {
   color: #fff;
   position: fixed;
   right: 20px;
-  bottom: 20px;
+  bottom: 78px; /* sits above the floating WhatsApp button */
   width: 40px;
   height: 40px;
   line-height: 40px;
@@ -1391,7 +1391,7 @@ p {
   box-shadow: 0 30px 55px rgba(11, 59, 149, 0.16);
 }
 
-/* Each event = one puzzle piece */
+/* Each event = one puzzle piece (a link to its full page) */
 .puzzle_card {
   position: relative;
   background: #ffffff;
@@ -1403,6 +1403,48 @@ p {
   flex-direction: column;
   min-height: 340px;
   overflow: visible;
+  text-decoration: none;
+  color: inherit;
+}
+
+.puzzle_card:hover,
+.puzzle_card:focus {
+  text-decoration: none;
+  color: inherit;
+}
+
+.puzzle_banner {
+  height: 160px;
+  overflow: hidden;
+  margin: -30px -24px 16px;
+  background: #e2e8f0;
+  position: relative;
+}
+
+.puzzle_banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.puzzle_banner .puzzle_badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  margin: 0;
+}
+
+.puzzle_photocount {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
 }
 
 /* Interlock: every piece has a knob poking out on its right (::before) and
@@ -1457,23 +1499,15 @@ p {
   transform: translateX(-50%);
 }
 
-/* Hover / expanded lift the whole piece (and its knobs) above the board */
+/* Hover lifts the whole piece (and its knobs) above the board */
 .puzzle_card:hover {
   background: #f2f8ff;
   box-shadow: inset 0 0 0 2px #0b3b95, 0 18px 40px rgba(11, 59, 149, 0.18);
   z-index: 20;
 }
 
-.puzzle_card.is-expanded {
-  background: #f6faff;
-  box-shadow: inset 0 0 0 2px #0b3b95, 0 26px 60px rgba(11, 59, 149, 0.22);
-  z-index: 21;
-}
-
 .puzzle_card:hover::before,
-.puzzle_card:hover::after,
-.puzzle_card.is-expanded::before,
-.puzzle_card.is-expanded::after {
+.puzzle_card:hover::after {
   border-color: #0b3b95;
 }
 
@@ -1560,25 +1594,7 @@ p {
   margin-bottom: 12px;
 }
 
-/* Expandable Drawer */
-.puzzle_expandable {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-  border-top: 1px dashed transparent;
-  padding-top: 0;
-  margin-top: 0;
-}
-
-.puzzle_card.is-expanded .puzzle_expandable {
-  max-height: 600px;
-  opacity: 1;
-  border-top-color: #cbd5e1;
-  padding-top: 18px;
-  margin-top: 14px;
-}
-
+/* "View full story →" hint at the bottom of each piece */
 .puzzle_expand_toggle {
   display: inline-flex;
   align-items: center;
@@ -1595,11 +1611,11 @@ p {
 
 .puzzle_expand_toggle i.toggle_icon {
   font-size: 16px;
-  transition: transform 0.3s ease;
+  transition: transform 0.25s ease;
 }
 
-.puzzle_card.is-expanded .puzzle_expand_toggle i.toggle_icon {
-  transform: rotate(180deg);
+.puzzle_card:hover .puzzle_expand_toggle i.toggle_icon {
+  transform: translateX(4px);
 }
 
 /* ==========================================================================
@@ -1783,3 +1799,250 @@ p {
   }
 }
 
+
+/* ==========================================================================
+   SUB-PAGE HEADER (solid navbar for event.html / page.html)
+   ========================================================================== */
+.header_navbar--page {
+  position: relative;
+  background: #ffffff;
+  box-shadow: 0 6px 24px rgba(11, 59, 149, 0.07);
+  border-bottom: 1px solid #eef2f7;
+}
+
+.header_navbar--page .navbar-nav .nav-item a { color: #222; }
+.header_navbar--page .navbar-nav .nav-item a::before { background-color: #0b3b95; }
+.header_navbar--page .navbar-nav .nav-item.active > a,
+.header_navbar--page .navbar-nav .nav-item:hover > a { color: #0b3b95; }
+.header_navbar--page .navbar-brand .brand-text { color: #0b3b95; }
+.header_navbar--page .navbar-toggler .toggler-icon { background-color: #222; }
+
+@media (max-width: 991px) {
+  .header_navbar--page .navbar-collapse {
+    background: #fff;
+    box-shadow: 0 15px 20px rgba(0, 0, 0, 0.1);
+    padding: 5px 12px;
+  }
+}
+
+/* ==========================================================================
+   FLOATING "JOIN WHATSAPP GROUP" BUTTON
+   ========================================================================== */
+.tbp-whatsapp-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  height: 52px;
+  padding: 0 15px;
+  border-radius: 30px;
+  background: var(--wa-color, #25D366);
+  color: #ffffff !important;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  transition: gap 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  max-width: 52px;
+}
+
+.tbp-whatsapp-fab i {
+  font-size: 24px;
+  flex: 0 0 auto;
+}
+
+.tbp-whatsapp-label {
+  white-space: nowrap;
+  opacity: 0;
+  max-width: 0;
+  transition: opacity 0.25s ease, max-width 0.3s ease, margin 0.3s ease;
+}
+
+.tbp-whatsapp-fab:hover,
+.tbp-whatsapp-fab:focus {
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+  gap: 10px;
+  max-width: 340px;
+}
+
+.tbp-whatsapp-fab:hover .tbp-whatsapp-label,
+.tbp-whatsapp-fab:focus .tbp-whatsapp-label {
+  opacity: 1;
+  max-width: 260px;
+}
+
+@media (min-width: 992px) {
+  /* On desktop, show the label at rest too */
+  .tbp-whatsapp-fab { max-width: 340px; gap: 10px; }
+  .tbp-whatsapp-fab .tbp-whatsapp-label { opacity: 1; max-width: 260px; }
+}
+
+@media (max-width: 400px) {
+  .tbp-whatsapp-fab:hover, .tbp-whatsapp-fab:focus { max-width: 52px; gap: 0; }
+  .tbp-whatsapp-fab:hover .tbp-whatsapp-label, .tbp-whatsapp-fab:focus .tbp-whatsapp-label { opacity: 0; max-width: 0; }
+}
+
+/* ==========================================================================
+   EVENT DETAIL & CUSTOM PAGE
+   ========================================================================== */
+.detail_page {
+  display: block;
+  min-height: 60vh;
+}
+
+.detail_hero,
+.page_hero {
+  position: relative;
+  background-color: #0b3b95;
+  background-size: cover;
+  background-position: center;
+  color: #ffffff;
+  padding: 90px 0 70px;
+}
+
+.page_hero:not(.has-image) {
+  padding: 64px 0 46px;
+  background-color: #eef3fb;
+  border-bottom: 1px solid #dbe6f5;
+}
+
+.detail_hero_overlay,
+.page_hero_overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7, 37, 97, 0.55) 0%, rgba(7, 37, 97, 0.8) 100%);
+}
+
+.page_hero:not(.has-image) .page_hero_overlay { background: none; }
+
+.detail_hero_inner,
+.page_hero .container { position: relative; z-index: 1; }
+
+.detail_back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #cfe0ff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 16px;
+}
+.detail_back:hover { color: #ffffff; }
+
+.detail_badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+}
+
+.detail_title,
+.page_hero_title {
+  font-size: 40px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.25;
+  max-width: 800px;
+}
+
+.page_hero:not(.has-image) .page_hero_title { color: #0f172a; }
+
+.detail_meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 18px;
+  font-size: 14px;
+  color: #e2ebff;
+}
+.detail_meta span { display: inline-flex; align-items: center; gap: 6px; }
+
+.detail_body_wrap,
+.page_body_wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 50px 15px 90px;
+}
+
+.detail_body,
+.page_body {
+  font-size: 16px;
+  line-height: 1.85;
+  color: #334155;
+}
+
+.detail_body h2, .page_body h2 { font-size: 24px; font-weight: 700; color: #0f172a; margin: 32px 0 12px; }
+.detail_body h3, .page_body h3 { font-size: 19px; font-weight: 700; color: #0f172a; margin: 26px 0 10px; }
+.detail_body p, .page_body p { margin-bottom: 18px; }
+.detail_body ul, .page_body ul { margin: 0 0 18px 22px; }
+.detail_body li, .page_body li { margin-bottom: 8px; }
+.detail_body a, .page_body a { color: #0b3b95; font-weight: 600; }
+.detail_body img, .page_body img { border-radius: 12px; margin: 10px 0; }
+
+.detail_gallery_title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 20px 0 16px;
+}
+
+.detail_gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 36px;
+}
+
+.detail_gallery_item {
+  display: block;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border: 1px solid #dbe6f5;
+}
+
+.detail_gallery_item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+.detail_gallery_item:hover img { transform: scale(1.06); }
+
+.detail_cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  border-top: 1px solid #e9eef5;
+  padding-top: 28px;
+}
+
+.detail_notfound {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 110px 20px;
+  text-align: center;
+}
+.detail_notfound i { font-size: 46px; color: #0b3b95; }
+.detail_notfound h2 { font-size: 26px; font-weight: 700; margin: 16px 0 8px; color: #0f172a; }
+.detail_notfound p { color: #64748b; margin-bottom: 24px; }
+
+@media (max-width: 767px) {
+  .detail_title, .page_hero_title { font-size: 28px; }
+  .detail_body_wrap, .page_body_wrap { padding: 36px 15px 70px; }
+  .tbp-whatsapp-fab { height: 48px; }
+}

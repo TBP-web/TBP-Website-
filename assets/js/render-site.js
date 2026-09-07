@@ -1,13 +1,101 @@
 /**
  * The Bandhan Project (tbp;) - Dynamic Frontend Site Renderer
- * Reads the merged content object from window.TBP_DATA and renders every part of
- * index.html: navigation menu, section visibility, hero, about, vision/mission,
- * yKnot, the events jigsaw board, founder's note, gallery, contact and footer
- * (social icons + link columns + newsletter box). Also: custom cursor and the
- * IntersectionObserver scroll-reveal animations.
+ * Runs on every page (index.html, event.html, page.html). Reads the merged
+ * content object from window.TBP_DATA and renders:
+ *   - the shared header + footer (injected into #tbp-header-mount / #tbp-footer-mount
+ *     on sub-pages; already present in index.html)
+ *   - the navigation menu (+ custom pages flagged "show in menu")
+ *   - homepage sections: hero, about, vision/mission, yKnot, events jigsaw board,
+ *     founder's note, gallery, contact
+ *   - event detail pages (event.html?id=…)
+ *   - custom pages (page.html?slug=…)
+ *   - the floating "Join WhatsApp Group" button
+ * Plus the custom cursor and IntersectionObserver scroll-reveal animations.
  */
 
 (function () {
+  // Which kind of page are we on?
+  const PATH = (location.pathname || '').split('/').pop().toLowerCase();
+  const IS_HOME = PATH === '' || PATH === 'index.html' || PATH === 'index.htm';
+
+  // Shared header markup for sub-pages (index.html keeps its own, with the hero).
+  const SUBPAGE_HEADER_HTML = `
+    <section class="header_area">
+      <div class="header_navbar header_navbar--page">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-expand-lg">
+                <a class="navbar-brand" href="index.html">
+                  <img src="assets/images/logo.png" alt="The Bandhan Project" class="brand-logo-img tbp-brand-logo">
+                  <span class="brand-text">tbp;<small>lean into Goodness</small></span>
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="toggler-icon"></span><span class="toggler-icon"></span><span class="toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
+                  <ul id="nav" class="navbar-nav ml-auto align-items-lg-center"></ul>
+                </div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>`;
+
+  // Shared footer markup for sub-pages (mirrors the footer in index.html).
+  const SUBPAGE_FOOTER_HTML = `
+    <section id="footer" class="footer_area">
+      <div class="footer_widget pt-80 pb-100">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-4 col-md-6 order-md-1 order-lg-1">
+              <div class="footer_about mt-50">
+                <a href="index.html" class="d-inline-flex align-items-center gap-2 mb-3 text-white text-decoration-none">
+                  <img src="assets/images/logo.png" alt="The Bandhan Project" class="brand-logo-img tbp-brand-logo" style="height:48px; background:#fff; padding:4px; border-radius:8px;">
+                  <div style="margin-left:10px;">
+                    <span id="footer-brand-name" style="font-size:20px; font-weight:700; color:#fff; display:block; line-height:1.2;">The Bandhan Project</span>
+                    <small id="footer-brand-tagline" style="color:#93c5fd; font-size:12px; font-weight:500;">lean into Goodness</small>
+                  </div>
+                </a>
+                <p id="footer-about-text"></p>
+                <ul class="social" id="footer-social-list"></ul>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-12 order-md-3 order-lg-2">
+              <div class="footer_link_wrapper d-flex flex-wrap" id="footer-columns"></div>
+            </div>
+            <div class="col-lg-4 col-md-6 order-md-2 order-lg-3" id="footer-subscribe-block">
+              <div class="footer_subscribe mt-45">
+                <h4 class="footer_title" id="footer-subscribe-title">Stay Updated</h4>
+                <p id="footer-subscribe-text"></p>
+                <div class="subscribe_form">
+                  <form action="javascript:void(0)" onsubmit="alert('Thank you for subscribing to The Bandhan Project updates!'); this.reset();">
+                    <input type="email" placeholder="Enter your email" required>
+                    <button type="submit" aria-label="Subscribe"><i class="lni lni-arrow-right"></i></button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="text-center mt-70" id="footer-copyright"></p>
+      </div>
+    </section>`;
+
+  function buildSubPageChrome() {
+    const headerMount = document.getElementById('tbp-header-mount');
+    if (headerMount && !headerMount.dataset.built) {
+      headerMount.innerHTML = SUBPAGE_HEADER_HTML;
+      headerMount.dataset.built = '1';
+    }
+    const footerMount = document.getElementById('tbp-footer-mount');
+    if (footerMount && !footerMount.dataset.built) {
+      footerMount.innerHTML = SUBPAGE_FOOTER_HTML;
+      footerMount.dataset.built = '1';
+    }
+  }
+
   // Setup Custom Cursor
   function initCustomCursor() {
     if (window.matchMedia('(pointer: coarse)').matches) return; // Skip touch screens
@@ -70,7 +158,7 @@
       });
     }, { threshold: 0.12 });
 
-    const revealElements = document.querySelectorAll('.slider_content, .about_content, .about_vm_item, .yknot_content, .yknot_image_wrap, .founder_box, .puzzle_card, .gallery_item_card, .single_counter, .section_title');
+    const revealElements = document.querySelectorAll('.slider_content, .about_content, .about_vm_item, .yknot_content, .yknot_image_wrap, .founder_box, .puzzle_card, .gallery_item_card, .single_counter, .section_title, .detail_body, .detail_gallery_item, .page_body');
     revealElements.forEach(el => {
       el.classList.add('scroll-reveal');
       observer.observe(el);
@@ -82,6 +170,16 @@
     if (!window.TBP_DATA) return;
     const data = window.TBP_DATA.getData();
 
+    // Sub-pages: build the shared header/footer shell before anything else.
+    buildSubPageChrome();
+
+    // Site-wide floating button
+    renderWhatsApp(data);
+
+    // Sub-page renderers (each is a no-op if its container isn't on this page)
+    renderEventDetail(data);
+    renderCustomPage(data);
+
     // 0. Section visibility (show / hide whole blocks of the page)
     const sec = data.sections || {};
     applySectionVisibility('about', sec.about);
@@ -91,8 +189,10 @@
     applySectionVisibility('gallery', sec.gallery);
     applySectionVisibility('contact', sec.contact);
 
-    // 1. Update Metadata & Title
-    document.title = `${data.brand.name} (${data.brand.shortName}) — ${data.brand.tagline || 'lean into Goodness'}`;
+    // 1. Update Metadata & Title (sub-pages set their own title in their renderer)
+    if (!document.getElementById('event-detail') && !document.getElementById('custom-page')) {
+      document.title = `${data.brand.name} (${data.brand.shortName}) — ${data.brand.tagline || 'lean into Goodness'}`;
+    }
     const favicon = document.querySelector("link[rel*='icon']");
     if (favicon && data.brand.favicon) {
       favicon.href = data.brand.favicon;
@@ -227,17 +327,18 @@
 
           const primaryThumb = eventImages[0];
 
+          const brief = event.description
+            ? (event.description.length > 110 ? event.description.substring(0, 110).trim() + '…' : event.description)
+            : '';
+
           return `
-              <div class="puzzle_card event-card" data-event-id="${escapeHtml(event.id)}" onclick="window.togglePuzzleCard(this, event)">
+              <a class="puzzle_card event-card" href="event.html?id=${encodeURIComponent(event.id)}" data-event-id="${escapeHtml(event.id)}">
                 <span class="pz_socket pz_socket_l"></span>
                 <span class="pz_socket pz_socket_t"></span>
-                <!-- Top Cover Thumbnail Banner -->
-                <div style="height:160px; overflow:hidden; margin:-30px -24px 16px; background:#e2e8f0; position:relative;">
-                  <img src="${primaryThumb}" alt="${escapeHtml(event.title)}" style="width:100%; height:100%; object-fit:cover;">
-                  <span class="puzzle_badge" style="position:absolute; top:12px; left:12px; margin:0;"><i class="lni lni-checkmark-circle"></i> ${escapeHtml(event.category || 'Event')}</span>
-                  <span style="position:absolute; bottom:10px; right:12px; background:rgba(0,0,0,0.65); color:#fff; font-size:11px; font-weight:600; padding:3px 8px; border-radius:6px; backdrop-filter:blur(4px);">
-                    ${eventImages.length} Photos 📷
-                  </span>
+                <div class="puzzle_banner">
+                  <img src="${escapeHtml(primaryThumb)}" alt="${escapeHtml(event.title)}">
+                  <span class="puzzle_badge"><i class="lni lni-checkmark-circle"></i> ${escapeHtml(event.category || 'Event')}</span>
+                  <span class="puzzle_photocount">${eventImages.length} Photos 📷</span>
                 </div>
 
                 <h4 class="puzzle_title">${escapeHtml(event.title)}</h4>
@@ -249,33 +350,13 @@
 
                 ${event.location ? `<div class="puzzle_meta"><span><i class="lni lni-map-marker"></i> ${escapeHtml(event.location)}</span></div>` : ''}
 
-                <!-- Short Preview Snippet -->
-                <p class="puzzle_brief">${escapeHtml(event.description ? event.description.substring(0, 90) + '...' : '')}</p>
+                <p class="puzzle_brief">${escapeHtml(brief)}</p>
 
-                <!-- Expandable Body (Expands smoothly on click) -->
-                <div class="puzzle_expandable">
-                  <div style="margin-bottom:14px;">
-                    <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Event Photos & Moments</span>
-                    <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:6px;">
-                      ${eventImages.map((imgUrl, pIdx) => `
-                        <a href="${imgUrl}" target="_blank" onclick="event.stopPropagation();" style="flex:0 0 75px; height:58px; border-radius:8px; overflow:hidden; border:1px solid #cbd5e1; display:block;">
-                          <img src="${imgUrl}" alt="Moment ${pIdx+1}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.2s ease;">
-                        </a>
-                      `).join('')}
-                    </div>
-                  </div>
-
-                  <div style="font-size: 13.5px; color: #334155; line-height: 1.7; margin-bottom: 8px;">
-                    ${escapeHtml(event.description || '')}
-                  </div>
-                </div>
-
-                <!-- Click to expand hint -->
                 <div class="puzzle_expand_toggle">
-                  <span class="toggle_text">Click to view story & photos</span>
-                  <i class="lni lni-chevron-down toggle_icon"></i>
+                  <span class="toggle_text">View full story &amp; photos</span>
+                  <i class="lni lni-arrow-right toggle_icon"></i>
                 </div>
-              </div>
+              </a>
           `;
         }).join('');
       }
@@ -334,14 +415,29 @@
   }
 
   // ---- Navigation menu -----------------------------------------------------
+  // On sub-pages, a "#about" link becomes "index.html#about" so it still works.
+  function navHref(link) {
+    link = link || '#';
+    if (!IS_HOME && link.charAt(0) === '#' && link.length > 1) return 'index.html' + link;
+    return link;
+  }
+
   function renderNavigation(data) {
     const navUl = document.getElementById('nav');
-    const menu = data.navigation && Array.isArray(data.navigation.menu) ? data.navigation.menu : [];
-    if (!navUl || menu.length === 0) return;
+    if (!navUl) return;
+
+    const menu = (data.navigation && Array.isArray(data.navigation.menu)) ? data.navigation.menu.slice() : [];
+    // Custom pages that opted into the menu
+    (Array.isArray(data.pages) ? data.pages : []).forEach(p => {
+      if (p && p.showInNav && p.slug) {
+        menu.push({ id: 'pagenav_' + p.slug, label: p.navLabel || p.title || p.slug, link: 'page.html?slug=' + encodeURIComponent(p.slug) });
+      }
+    });
+    if (menu.length === 0) return;
 
     navUl.innerHTML = menu.map((item, i) => `
       <li class="nav-item${i === 0 ? ' active' : ''}">
-        <a class="page-scroll" href="${escapeHtml(item.link || '#')}">${escapeHtml(item.label || '')}</a>
+        <a class="page-scroll" href="${escapeHtml(navHref(item.link))}">${escapeHtml(item.label || '')}</a>
       </li>`).join('');
 
     navUl.querySelectorAll('a.page-scroll').forEach(a => {
@@ -352,6 +448,7 @@
 
   function onNavLinkClick(e) {
     const href = this.getAttribute('href') || '';
+    // Same-page anchor → smooth scroll. Anything else → let the browser navigate.
     if (href.charAt(0) === '#' && href.length > 1) {
       const target = document.querySelector(href);
       if (target) {
@@ -360,12 +457,10 @@
         smoothScrollTo(y, 600);
       }
     }
-    // Close the mobile menu after any click
     const collapse = document.getElementById('navbarSupportedContent');
     if (collapse) collapse.classList.remove('show');
     const toggler = document.querySelector('.navbar-toggler');
     if (toggler) toggler.classList.remove('active');
-    // Move the active highlight
     document.querySelectorAll('#nav .nav-item').forEach(li => li.classList.remove('active'));
     const li = this.closest('.nav-item');
     if (li) li.classList.add('active');
@@ -438,19 +533,150 @@
     }, 16);
   }
 
-  // Interactive Click to Expand for Event Card
-  window.togglePuzzleCard = function(cardEl, ev) {
-    const isExpanded = cardEl.classList.contains('is-expanded');
-    const toggleText = cardEl.querySelector('.toggle_text');
+  // ---- Floating "Join WhatsApp Group" button ---------------------------------
+  function renderWhatsApp(data) {
+    const w = data.whatsapp || {};
+    let btn = document.getElementById('tbp-whatsapp-fab');
+    const on = w.enabled !== false && !!w.url;
 
-    if (isExpanded) {
-      cardEl.classList.remove('is-expanded');
-      if (toggleText) toggleText.textContent = 'Click to view story & photos';
-    } else {
-      cardEl.classList.add('is-expanded');
-      if (toggleText) toggleText.textContent = 'Click to collapse';
+    if (!on) {
+      if (btn) btn.remove();
+      return;
     }
-  };
+    if (!btn) {
+      btn = document.createElement('a');
+      btn.id = 'tbp-whatsapp-fab';
+      btn.className = 'tbp-whatsapp-fab';
+      btn.target = '_blank';
+      btn.rel = 'noopener';
+      document.body.appendChild(btn);
+    }
+    btn.href = w.url;
+    btn.style.setProperty('--wa-color', w.color || '#25D366');
+    btn.setAttribute('aria-label', w.label || 'Join our WhatsApp Group');
+    btn.innerHTML = `<i class="lni lni-whatsapp"></i><span class="tbp-whatsapp-label">${escapeHtml(w.label || 'Join our WhatsApp Group')}</span>`;
+  }
+
+  // ---- Event detail page (event.html?id=…) ----------------------------------
+  function renderEventDetail(data) {
+    const box = document.getElementById('event-detail');
+    if (!box) return;
+
+    const id = new URLSearchParams(location.search).get('id');
+    const event = (Array.isArray(data.events) ? data.events : []).find(e => e.id === id);
+
+    if (!event) {
+      document.title = 'Event not found — ' + (data.brand ? data.brand.name : 'The Bandhan Project');
+      box.innerHTML = `
+        <div class="detail_notfound">
+          <i class="lni lni-calendar"></i>
+          <h2>Event not found</h2>
+          <p>This event may have been removed or the link is incorrect.</p>
+          <a href="index.html#events" class="main-btn">Back to all events</a>
+        </div>`;
+      return;
+    }
+
+    const imgs = (Array.isArray(event.images) ? event.images : [event.image])
+      .filter(u => u && String(u).trim().length);
+    if (imgs.length === 0) imgs.push('assets/images/hero-area.jpg');
+
+    document.title = event.title + ' — ' + (data.brand ? data.brand.name : 'The Bandhan Project');
+
+    const meta = [];
+    if (event.date) meta.push(`<span><i class="lni lni-calendar"></i> ${escapeHtml(event.date)}</span>`);
+    if (event.time) meta.push(`<span><i class="lni lni-timer"></i> ${escapeHtml(event.time)}</span>`);
+    if (event.location) meta.push(`<span><i class="lni lni-map-marker"></i> ${escapeHtml(event.location)}</span>`);
+
+    box.innerHTML = `
+      <div class="detail_hero" style="background-image:url('${escapeHtml(imgs[0])}')">
+        <div class="detail_hero_overlay"></div>
+        <div class="container detail_hero_inner">
+          <a href="index.html#events" class="detail_back"><i class="lni lni-arrow-left"></i> All Events &amp; Drives</a>
+          ${event.category ? `<span class="detail_badge">${escapeHtml(event.category)}</span>` : ''}
+          <h1 class="detail_title">${escapeHtml(event.title)}</h1>
+          <div class="detail_meta">${meta.join('')}</div>
+        </div>
+      </div>
+      <div class="container detail_body_wrap">
+        <div class="detail_body">
+          ${mdToHtml(event.body || event.description || '')}
+        </div>
+        ${imgs.length ? `
+          <h3 class="detail_gallery_title">Photos &amp; Moments</h3>
+          <div class="detail_gallery">
+            ${imgs.map((u, i) => `<a href="${escapeHtml(u)}" target="_blank" rel="noopener" class="detail_gallery_item"><img src="${escapeHtml(u)}" alt="${escapeHtml(event.title)} photo ${i + 1}" loading="lazy"></a>`).join('')}
+          </div>` : ''}
+        <div class="detail_cta">
+          <a href="index.html#events" class="main-btn main-btn-2">More Events</a>
+          <a href="index.html#contact" class="main-btn">Get in Touch</a>
+        </div>
+      </div>`;
+  }
+
+  // ---- Custom page (page.html?slug=…) --------------------------------------
+  function renderCustomPage(data) {
+    const box = document.getElementById('custom-page');
+    if (!box) return;
+
+    const slug = new URLSearchParams(location.search).get('slug');
+    const page = (Array.isArray(data.pages) ? data.pages : []).find(p => p.slug === slug);
+
+    if (!page) {
+      document.title = 'Page not found — ' + (data.brand ? data.brand.name : 'The Bandhan Project');
+      box.innerHTML = `
+        <div class="detail_notfound">
+          <i class="lni lni-files"></i>
+          <h2>Page not found</h2>
+          <p>This page may have been removed or the link is incorrect.</p>
+          <a href="index.html" class="main-btn">Back to Home</a>
+        </div>`;
+      return;
+    }
+
+    document.title = page.title + ' — ' + (data.brand ? data.brand.name : 'The Bandhan Project');
+
+    box.innerHTML = `
+      <div class="page_hero${page.heroImage ? ' has-image' : ''}"${page.heroImage ? ` style="background-image:url('${escapeHtml(page.heroImage)}')"` : ''}>
+        <div class="page_hero_overlay"></div>
+        <div class="container">
+          <h1 class="page_hero_title">${escapeHtml(page.title)}</h1>
+        </div>
+      </div>
+      <div class="container page_body_wrap">
+        <div class="page_body">${mdToHtml(page.body || '')}</div>
+        <div class="detail_cta"><a href="index.html" class="main-btn">Back to Home</a></div>
+      </div>`;
+  }
+
+  // ---- Tiny Markdown subset → HTML ----------------------------------------
+  // Supports: ## / ### headings, blank-line paragraphs, - bullet lists,
+  // **bold**, *italic*, [text](url), ![alt](url). Input is HTML-escaped first.
+  function mdToHtml(src) {
+    if (!src) return '';
+    const esc = escapeHtml(String(src));
+    const blocks = esc.split(/\n\s*\n/);
+    return blocks.map(block => {
+      const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length === 0) return '';
+      if (/^###\s+/.test(lines[0]) && lines.length === 1) return `<h3>${inline(lines[0].replace(/^###\s+/, ''))}</h3>`;
+      if (/^##\s+/.test(lines[0]) && lines.length === 1) return `<h2>${inline(lines[0].replace(/^##\s+/, ''))}</h2>`;
+      if (lines.every(l => /^[-*]\s+/.test(l))) {
+        return `<ul>${lines.map(l => `<li>${inline(l.replace(/^[-*]\s+/, ''))}</li>`).join('')}</ul>`;
+      }
+      const imgMatch = lines.length === 1 && lines[0].match(/^!\[([^\]]*)\]\(([^)\s]+)\)$/);
+      if (imgMatch) return `<p><img src="${imgMatch[2]}" alt="${imgMatch[1]}" loading="lazy"></p>`;
+      return `<p>${lines.map(inline).join('<br>')}</p>`;
+    }).join('\n');
+
+    function inline(t) {
+      return t
+        .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, '<img src="$2" alt="$1" loading="lazy">')
+        .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+    }
+  }
 
   function setText(id, value) {
     const el = document.getElementById(id);
@@ -475,17 +701,26 @@
     }
   });
 
-  // Initial render when DOM is loaded
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      renderAll();
-      initCustomCursor();
-      initScrollMotions();
-    });
-  } else {
+  function boot() {
     renderAll();
     initCustomCursor();
     initScrollMotions();
+    // Arriving on the homepage with #section in the URL (e.g. from a sub-page nav link)
+    if (IS_HOME && location.hash && location.hash.length > 1) {
+      const target = document.querySelector(location.hash);
+      if (target) {
+        setTimeout(() => {
+          window.scrollTo(0, target.getBoundingClientRect().top + window.pageYOffset - 60);
+        }, 60);
+      }
+    }
+  }
+
+  // Initial render when DOM is loaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
   }
 
   // Re-render immediately on data update events

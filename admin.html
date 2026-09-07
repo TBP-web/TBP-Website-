@@ -107,6 +107,11 @@
           <span>Navigation &amp; Layout</span>
         </button>
 
+        <button type="button" class="sidebar-nav-item" data-tab="pages">
+          <i class="lni lni-files"></i>
+          <span>Custom Pages</span>
+        </button>
+
         <div class="nav-category mt-3">Administration</div>
 
         <button type="button" class="sidebar-nav-item" data-tab="settings">
@@ -699,6 +704,62 @@
             </form>
           </div>
 
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">Floating "Join WhatsApp Group" Button</h3>
+                <p class="content-card-desc">A round button that stays in the bottom-right corner on every page. <strong>Paste your group invite link</strong> (from WhatsApp &rarr; group &rarr; Invite via link) before you go live.</p>
+              </div>
+            </div>
+            <form id="whatsapp-form">
+              <label class="section-toggle mb-3" style="max-width:340px;">
+                <input type="checkbox" id="wa-enabled"> <span>Show the WhatsApp button</span>
+              </label>
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="wa-label">Button Label</label>
+                  <input type="text" id="wa-label" class="admin-form-control" placeholder="Join our WhatsApp Group">
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="wa-color">Button Colour</label>
+                  <input type="text" id="wa-color" class="admin-form-control" placeholder="#25D366">
+                </div>
+              </div>
+              <div class="admin-form-group">
+                <label for="wa-url">Group Invite Link</label>
+                <input type="text" id="wa-url" class="admin-form-control" placeholder="https://chat.whatsapp.com/…">
+              </div>
+              <button type="submit" class="btn-save-section">
+                <i class="lni lni-checkmark"></i> Save WhatsApp Button
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- ===================================================================
+             TAB: CUSTOM PAGES
+             =================================================================== -->
+        <div id="tab-pages" class="admin-tab-pane" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">Custom Pages</h3>
+                <p class="content-card-desc">Build extra pages (Volunteer, Programs, FAQ …). Each one lives at <code>page.html?slug=&lt;slug&gt;</code> and can be added to the top menu. Body text uses simple Markdown — <code>## Heading</code>, <code>- bullet</code>, <code>**bold**</code>, <code>[link](https://…)</code>.</p>
+              </div>
+              <button type="button" class="btn-admin-primary" id="btn-add-page" style="width:auto; padding:0 18px; height:40px; font-size:13.5px;">
+                <i class="lni lni-plus"></i> Add Page
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr><th>Title</th><th>Link (slug)</th><th>In menu</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="pages-table-body"></tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
         <!-- ===================================================================
@@ -870,8 +931,13 @@
           </div>
 
           <div class="admin-form-group">
-            <label for="modal-event-desc">Event Story, Recap & Impact Highlights (Shown when card is expanded)</label>
-            <textarea id="modal-event-desc" class="admin-form-control" placeholder="Describe the event, keynote highlights, attendee stories, and outcomes..."></textarea>
+            <label for="modal-event-desc">Short Summary (shown on the jigsaw card)</label>
+            <textarea id="modal-event-desc" class="admin-form-control" style="min-height:70px;" placeholder="One or two sentences describing the event..."></textarea>
+          </div>
+
+          <div class="admin-form-group">
+            <label for="modal-event-body">Full Story (shown on the event's own page)</label>
+            <textarea id="modal-event-body" class="admin-form-control" style="min-height:150px;" placeholder="The full recap. Blank line = new paragraph. Simple Markdown works: ## Heading, - bullet, **bold**, [link](https://…). Leave blank to reuse the short summary."></textarea>
           </div>
 
           <div class="form-check mt-3">
@@ -884,6 +950,69 @@
           <button type="button" class="btn-secondary modal-cancel">Cancel</button>
           <button type="submit" class="btn-admin-primary" style="width: auto; padding: 0 24px;">
             <i class="lni lni-checkmark"></i> Save Event
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       CUSTOM PAGE MODAL (ADD / EDIT)
+       ========================================================================= -->
+  <div id="page-modal" class="admin-modal-backdrop">
+    <div class="admin-modal">
+      <div class="admin-modal-header">
+        <h4 id="page-modal-title">Add Page</h4>
+        <button type="button" class="admin-modal-close"><i class="lni lni-close"></i></button>
+      </div>
+
+      <form id="page-form">
+        <div class="admin-modal-body">
+          <input type="hidden" id="page-id">
+
+          <div class="form-row">
+            <div class="form-col admin-form-group">
+              <label for="page-title">Page Title</label>
+              <input type="text" id="page-title" class="admin-form-control" placeholder="Volunteer With Us" required>
+            </div>
+            <div class="form-col admin-form-group">
+              <label for="page-slug">URL Slug</label>
+              <input type="text" id="page-slug" class="admin-form-control" placeholder="volunteer" required>
+              <small class="text-muted d-block mt-1">Lowercase, no spaces. The page opens at <code>page.html?slug=<span id="page-slug-echo">volunteer</span></code></small>
+            </div>
+          </div>
+
+          <div class="admin-form-group">
+            <label>Hero Image (optional)</label>
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <img id="page-hero-preview" src="assets/images/hero-area.jpg" style="height:60px; width:100px; object-fit:cover; border-radius:8px; border:1px solid #cbd5e1;">
+              <input type="file" accept="image/*" onchange="handleImageUpload(this, 'page-hero-url', 'page-hero-preview')" class="form-control-file" style="font-size:13px;">
+            </div>
+            <input type="text" id="page-hero-url" class="admin-form-control" placeholder="assets/images/hero-area.jpg  (leave blank for no image)">
+          </div>
+
+          <div class="admin-form-group">
+            <label for="page-body">Page Content</label>
+            <textarea id="page-body" class="admin-form-control" style="min-height:220px;" placeholder="Write the page here.&#10;&#10;Blank line = new paragraph.&#10;## A heading&#10;- a bullet point&#10;**bold text**, [a link](https://example.com)"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-col admin-form-group">
+              <label for="page-navlabel">Menu Label (when shown in menu)</label>
+              <input type="text" id="page-navlabel" class="admin-form-control" placeholder="Volunteer">
+            </div>
+            <div class="form-col admin-form-group" style="display:flex; align-items:flex-end;">
+              <label class="section-toggle" style="width:100%;">
+                <input type="checkbox" id="page-shownav"> <span>Add this page to the top menu</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-secondary modal-cancel">Cancel</button>
+          <button type="submit" class="btn-admin-primary" style="width:auto; padding:0 24px;">
+            <i class="lni lni-checkmark"></i> Save Page
           </button>
         </div>
       </form>

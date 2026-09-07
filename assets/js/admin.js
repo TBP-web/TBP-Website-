@@ -184,6 +184,16 @@ document.addEventListener('DOMContentLoaded', () => {
     setChecked('sec-gallery', sec.gallery);
     setChecked('sec-contact', sec.contact);
 
+    // 7b. WhatsApp button
+    const wa = data.whatsapp || {};
+    setChecked('wa-enabled', wa.enabled);
+    setVal('wa-label', wa.label);
+    setVal('wa-url', wa.url);
+    setVal('wa-color', wa.color || '#25D366');
+
+    // 7c. Custom pages
+    renderPagesTable(Array.isArray(data.pages) ? data.pages : []);
+
     // 8. Render Gallery Grid in Admin
     renderAdminGallery(data.gallery || []);
 
@@ -265,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setVal('modal-event-time', event.time || '');
     setVal('modal-event-location', event.location || '');
     setVal('modal-event-desc', event.description || '');
+    setVal('modal-event-body', event.body || '');
     document.getElementById('modal-event-active').checked = event.active !== false;
 
     // Load 4 photo slots
@@ -349,6 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
         images: eventPhotos,
         image: eventPhotos[0],
         description: document.getElementById('modal-event-desc').value.trim(),
+        body: document.getElementById('modal-event-body').value.trim(),
         active: document.getElementById('modal-event-active').checked
       };
 
@@ -779,6 +791,145 @@ document.addEventListener('DOMContentLoaded', () => {
       // keep the yKnot-tab checkbox in sync
       const yk = document.getElementById('yknot-active');
       if (yk) yk.checked = data.sections.yknot;
+    });
+  }
+
+  // =========================================================================
+  // FLOATING WHATSAPP BUTTON
+  // =========================================================================
+  const whatsappForm = document.getElementById('whatsapp-form');
+  if (whatsappForm) {
+    whatsappForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = dataManager.getData();
+      data.whatsapp = data.whatsapp || {};
+      data.whatsapp.enabled = document.getElementById('wa-enabled').checked;
+      data.whatsapp.label = getVal('wa-label') || 'Join our WhatsApp Group';
+      data.whatsapp.url = getVal('wa-url');
+      data.whatsapp.color = getVal('wa-color') || '#25D366';
+      persist(data, 'WhatsApp button saved!');
+    });
+  }
+
+  // =========================================================================
+  // CUSTOM PAGES CRUD
+  // =========================================================================
+  const pageModal = document.getElementById('page-modal');
+  const pageForm = document.getElementById('page-form');
+  const addPageBtn = document.getElementById('btn-add-page');
+
+  function slugify(s) {
+    return String(s || '').toLowerCase().trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  function renderPagesTable(pages) {
+    const tbody = document.getElementById('pages-table-body');
+    if (!tbody) return;
+    if (!pages.length) {
+      tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No custom pages yet. Click "Add Page" to create one.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = pages.map(p => `
+      <tr>
+        <td><strong>${escapeHtml(p.title || '(untitled)')}</strong></td>
+        <td><code>page.html?slug=${escapeHtml(p.slug || '')}</code></td>
+        <td>${p.showInNav ? '<span class="status-badge active">In menu</span>' : '<span class="status-badge inactive">Hidden</span>'}</td>
+        <td>
+          <div class="action-btn-group">
+            <a class="btn-action" title="Open page" href="page.html?slug=${encodeURIComponent(p.slug || '')}" target="_blank"><i class="lni lni-eye"></i></a>
+            <button type="button" class="btn-action" title="Edit" onclick="window.editPage('${p.id}')"><i class="lni lni-pencil"></i></button>
+            <button type="button" class="btn-action btn-delete" title="Delete" onclick="window.deletePage('${p.id}')"><i class="lni lni-trash"></i></button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  function openPageModal(page) {
+    page = page || {};
+    setVal('page-id', page.id || ('page_' + rid()));
+    setVal('page-title', page.title || '');
+    setVal('page-slug', page.slug || '');
+    setVal('page-navlabel', page.navLabel || '');
+    setVal('page-hero-url', page.heroImage || '');
+    setVal('page-body', page.body || '');
+    updateImagePreview('page-hero-preview', page.heroImage || 'assets/images/hero-area.jpg');
+    document.getElementById('page-shownav').checked = !!page.showInNav;
+    document.getElementById('page-slug-echo').textContent = page.slug || 'volunteer';
+    document.getElementById('page-modal-title').textContent = page.title ? 'Edit Page' : 'Add Page';
+    openModal(pageModal);
+  }
+
+  if (addPageBtn) {
+    addPageBtn.addEventListener('click', () => openPageModal(null));
+  }
+
+  // Auto-fill slug from title (only while slug is untouched / empty)
+  const pageTitleInput = document.getElementById('page-title');
+  const pageSlugInput = document.getElementById('page-slug');
+  if (pageTitleInput && pageSlugInput) {
+    pageTitleInput.addEventListener('input', () => {
+      if (!pageSlugInput.dataset.touched) {
+        pageSlugInput.value = slugify(pageTitleInput.value);
+        document.getElementById('page-slug-echo').textContent = pageSlugInput.value || 'volunteer';
+      }
+    });
+    pageSlugInput.addEventListener('input', () => {
+      pageSlugInput.dataset.touched = '1';
+      pageSlugInput.value = slugify(pageSlugInput.value);
+      document.getElementById('page-slug-echo').textContent = pageSlugInput.value || 'volunteer';
+    });
+  }
+
+  window.editPage = function (id) {
+    const page = (dataManager.getData().pages || []).find(p => p.id === id);
+    if (page) openPageModal(page);
+  };
+
+  window.deletePage = function (id) {
+    if (!confirm('Delete this page? Any menu links to it will stop working.')) return;
+    const data = dataManager.getData();
+    data.pages = (data.pages || []).filter(p => p.id !== id);
+    dataManager.saveData(data);
+    renderPagesTable(data.pages);
+    updateDraftStatus();
+    showToast('Page deleted.', 'success');
+  };
+
+  if (pageForm) {
+    pageForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = dataManager.getData();
+      data.pages = data.pages || [];
+      const id = getVal('page-id') || ('page_' + rid());
+      const slug = slugify(getVal('page-slug')) || slugify(getVal('page-title')) || ('page-' + rid());
+
+      if (data.pages.some(p => p.slug === slug && p.id !== id)) {
+        showToast('Another page already uses that slug. Pick a different one.', 'error');
+        return;
+      }
+
+      const newPage = {
+        id: id,
+        slug: slug,
+        title: getVal('page-title'),
+        navLabel: getVal('page-navlabel') || getVal('page-title'),
+        showInNav: document.getElementById('page-shownav').checked,
+        heroImage: getVal('page-hero-url'),
+        body: document.getElementById('page-body').value.trim()
+      };
+
+      const idx = data.pages.findIndex(p => p.id === id);
+      if (idx >= 0) data.pages[idx] = newPage;
+      else data.pages.push(newPage);
+
+      if (pageSlugInput) delete pageSlugInput.dataset.touched;
+      dataManager.saveData(data);
+      renderPagesTable(data.pages);
+      updateDraftStatus();
+      closeModal(pageModal);
+      showToast(idx >= 0 ? 'Page updated!' : 'Page created!', 'success');
     });
   }
 
