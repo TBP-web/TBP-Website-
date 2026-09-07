@@ -16,12 +16,12 @@ $(function() {
         }
     });
     
-    //===== Section Menu Active Scrolling
-    var scrollLink = $('.page-scroll');
+    //===== Section Menu Active Scrolling (re-queries links each scroll so it
+    //      keeps working after the menu is re-rendered by the CMS)
     $(window).scroll(function () {
         var scrollbarLocation = $(this).scrollTop();
 
-        scrollLink.each(function () {
+        $('.page-scroll').each(function () {
             var hash = this.hash;
             if (hash && $(hash).length) {
                 var sectionOffset = $(hash).offset().top - 80;
@@ -32,14 +32,9 @@ $(function() {
             }
         });
     });
-    
-    //===== Close navbar-collapse when a link is clicked
-    $(".navbar-nav a").on('click', function () {
-        $(".navbar-collapse").removeClass("show");
-        $(".navbar-toggler").removeClass('active');
-    });
 
-    $(".navbar-toggler").on('click', function () {
+    //===== Mobile menu toggle (smooth-scroll + closing is handled in render-site.js)
+    $(document).on('click', '.navbar-toggler', function () {
         $(this).toggleClass("active");
     });
     

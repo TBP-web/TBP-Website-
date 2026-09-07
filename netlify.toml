@@ -1,0 +1,40 @@
+# Netlify configuration for The Bandhan Project (tbp;)
+# The site is 100% static — there is no build step.
+
+[build]
+  publish = "."
+  command = ""
+
+# Pretty URL for the admin panel: /admin -> /admin.html
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+# --- Headers -------------------------------------------------------------
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+# HTML is revalidated every request so content edits show up immediately.
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# The published content file — always revalidate.
+[[headers]]
+  for = "/assets/js/content.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Everything else in /assets (CSS, JS libs, images, fonts) — cache 1 hour.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"

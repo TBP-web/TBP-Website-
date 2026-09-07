@@ -1,0 +1,16 @@
+# Static headers — read by Netlify and Cloudflare Pages.
+# (Netlify also reads netlify.toml; this file is the portable version.)
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/assets/js/content.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/assets/*
+  Cache-Control: public, max-age=3600

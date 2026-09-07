@@ -1,0 +1,8 @@
+# The Bandhan Project (tbp;)
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /admin
+
+# Add your sitemap once you have a domain, e.g.:
+# Sitemap: https://www.thebandhanproject.com/sitemap.xml

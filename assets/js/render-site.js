@@ -1,6 +1,10 @@
 /**
  * The Bandhan Project (tbp;) - Dynamic Frontend Site Renderer
- * Includes Custom Interactive Cursor, Scroll Reveal Motions, and Dynamic Event Shape System
+ * Reads the merged content object from window.TBP_DATA and renders every part of
+ * index.html: navigation menu, section visibility, hero, about, vision/mission,
+ * yKnot, the events jigsaw board, founder's note, gallery, contact and footer
+ * (social icons + link columns + newsletter box). Also: custom cursor and the
+ * IntersectionObserver scroll-reveal animations.
  */
 
 (function () {
@@ -78,12 +82,24 @@
     if (!window.TBP_DATA) return;
     const data = window.TBP_DATA.getData();
 
+    // 0. Section visibility (show / hide whole blocks of the page)
+    const sec = data.sections || {};
+    applySectionVisibility('about', sec.about);
+    applySectionVisibility('yknot', sec.yknot);
+    applySectionVisibility('events', sec.events);
+    applySectionVisibility('founder-note', sec.founder);
+    applySectionVisibility('gallery', sec.gallery);
+    applySectionVisibility('contact', sec.contact);
+
     // 1. Update Metadata & Title
     document.title = `${data.brand.name} (${data.brand.shortName}) — ${data.brand.tagline || 'lean into Goodness'}`;
     const favicon = document.querySelector("link[rel*='icon']");
     if (favicon && data.brand.favicon) {
       favicon.href = data.brand.favicon;
     }
+
+    // 1b. Navigation menu
+    renderNavigation(data);
 
     // 2. Update Brand Navbar & Tagline
     const brandElements = document.querySelectorAll('.tbp-brand-logo');
@@ -147,8 +163,6 @@
 
     // 4b. yKnot — First Impact Project
     const yknot = data.yknot || {};
-    const yknotSection = document.getElementById('yknot');
-    if (yknotSection) yknotSection.style.display = yknot.active === false ? 'none' : '';
     setText('yknot-badge', yknot.badge);
     setText('yknot-title', yknot.title);
     setText('yknot-subtitle', yknot.subtitle);
@@ -308,26 +322,120 @@
       `).join('');
     }
 
-    // 8. Update Contact & Footer
+    // 8. Update Contact
     const contactTitle = document.getElementById('contact-title');
     if (contactTitle) contactTitle.textContent = data.contact.title;
 
     const contactSubtitle = document.getElementById('contact-subtitle');
     if (contactSubtitle) contactSubtitle.textContent = data.contact.subtitle;
 
+    // 9. Footer
+    renderFooter(data);
+  }
+
+  // ---- Navigation menu -----------------------------------------------------
+  function renderNavigation(data) {
+    const navUl = document.getElementById('nav');
+    const menu = data.navigation && Array.isArray(data.navigation.menu) ? data.navigation.menu : [];
+    if (!navUl || menu.length === 0) return;
+
+    navUl.innerHTML = menu.map((item, i) => `
+      <li class="nav-item${i === 0 ? ' active' : ''}">
+        <a class="page-scroll" href="${escapeHtml(item.link || '#')}">${escapeHtml(item.label || '')}</a>
+      </li>`).join('');
+
+    navUl.querySelectorAll('a.page-scroll').forEach(a => {
+      a.removeEventListener('click', onNavLinkClick);
+      a.addEventListener('click', onNavLinkClick);
+    });
+  }
+
+  function onNavLinkClick(e) {
+    const href = this.getAttribute('href') || '';
+    if (href.charAt(0) === '#' && href.length > 1) {
+      const target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        const y = target.getBoundingClientRect().top + window.pageYOffset - 60;
+        smoothScrollTo(y, 600);
+      }
+    }
+    // Close the mobile menu after any click
+    const collapse = document.getElementById('navbarSupportedContent');
+    if (collapse) collapse.classList.remove('show');
+    const toggler = document.querySelector('.navbar-toggler');
+    if (toggler) toggler.classList.remove('active');
+    // Move the active highlight
+    document.querySelectorAll('#nav .nav-item').forEach(li => li.classList.remove('active'));
+    const li = this.closest('.nav-item');
+    if (li) li.classList.add('active');
+  }
+
+  // ---- Footer ------------------------------------------------------------
+  function renderFooter(data) {
+    const f = data.footer || {};
+
+    setText('footer-brand-name', f.brandName || (data.brand && data.brand.name));
+    setText('footer-brand-tagline', f.brandTagline || (data.brand && data.brand.tagline));
+
     const footerAbout = document.getElementById('footer-about-text');
-    if (footerAbout) footerAbout.textContent = data.footer.aboutText;
+    if (footerAbout) footerAbout.textContent = f.aboutText || '';
+
+    // Social icons
+    const socialList = document.getElementById('footer-social-list');
+    if (socialList) {
+      socialList.innerHTML = (Array.isArray(f.socials) ? f.socials : [])
+        .filter(s => s && s.url)
+        .map(s => `<li><a class="tbp-social" href="${escapeHtml(s.url)}" target="_blank" rel="noopener" aria-label="${escapeHtml(s.label || 'Social')}"><i class="lni ${escapeHtml(s.icon || 'lni-link')}"></i></a></li>`)
+        .join('');
+    }
+
+    // Link columns
+    const cols = document.getElementById('footer-columns');
+    if (cols) {
+      cols.innerHTML = (Array.isArray(f.columns) ? f.columns : []).map(col => `
+        <div class="footer_link mt-45">
+          <h4 class="footer_title">${escapeHtml(col.title || '')}</h4>
+          <ul class="link">
+            ${(Array.isArray(col.links) ? col.links : []).map(l => `<li><a href="${escapeHtml(l.url || '#')}">${escapeHtml(l.label || '')}</a></li>`).join('')}
+          </ul>
+        </div>`).join('');
+    }
+
+    // Newsletter box
+    const subBlock = document.getElementById('footer-subscribe-block');
+    if (subBlock) subBlock.style.display = f.showSubscribe === false ? 'none' : '';
+    setText('footer-subscribe-title', f.subscribeTitle);
+    setText('footer-subscribe-text', f.subscribeText);
 
     const footerCopyright = document.getElementById('footer-copyright');
     if (footerCopyright) {
-      footerCopyright.innerHTML = `${data.footer.copyright} <a href="admin.html" style="opacity:0.3; color:inherit; text-decoration:none; margin-left:4px;" title="Admin Portal">🔒</a>`;
+      footerCopyright.innerHTML = `${escapeHtml(f.copyright || '')} <a href="admin.html" style="opacity:0.3; color:inherit; text-decoration:none; margin-left:4px;" title="Admin Portal">🔒</a>`;
     }
+  }
 
-    // Social Links
-    updateSocialLink('.social_1', data.contact.facebook);
-    updateSocialLink('.social_2', data.contact.twitter);
-    updateSocialLink('.social_3', data.contact.instagram);
-    updateSocialLink('.social_4', data.contact.linkedin);
+  function applySectionVisibility(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = value === false ? 'none' : '';
+  }
+
+  // Self-contained smooth scroll (timer-based, so it does not depend on native
+  // `behavior:'smooth'` support).
+  function smoothScrollTo(targetY, duration) {
+    const startY = window.pageYOffset;
+    const distance = targetY - startY;
+    if (Math.abs(distance) < 2) {
+      window.scrollTo(0, targetY);
+      return;
+    }
+    duration = duration || 600;
+    const startTime = Date.now();
+    const timer = setInterval(function () {
+      const p = Math.min(1, (Date.now() - startTime) / duration);
+      const ease = p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p; // easeInOutQuad
+      window.scrollTo(0, Math.round(startY + distance * ease));
+      if (p >= 1) clearInterval(timer);
+    }, 16);
   }
 
   // Interactive Click to Expand for Event Card
@@ -343,19 +451,6 @@
       if (toggleText) toggleText.textContent = 'Click to collapse';
     }
   };
-
-  function updateSocialLink(selector, url) {
-    const links = document.querySelectorAll(selector);
-    links.forEach(a => {
-      if (url) {
-        a.href = url;
-        a.target = "_blank";
-        a.style.display = "inline-block";
-      } else {
-        a.style.display = "none";
-      }
-    });
-  }
 
   function setText(id, value) {
     const el = document.getElementById(id);

@@ -1,0 +1,19 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Node (only relevant if you add build tooling later)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Local previews / scratch files (never deploy these)
+/_*.html
+/serve.js
+*.local
+
+# Backups exported from the admin panel
+the-bandhan-project-backup-*.json

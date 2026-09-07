@@ -97,14 +97,21 @@
 
         <button type="button" class="sidebar-nav-item" data-tab="contact">
           <i class="lni lni-phone"></i>
-          <span>Contact & Footer</span>
+          <span>Contact &amp; Footer</span>
+        </button>
+
+        <div class="nav-category mt-3">Site Structure</div>
+
+        <button type="button" class="sidebar-nav-item" data-tab="navlayout">
+          <i class="lni lni-menu"></i>
+          <span>Navigation &amp; Layout</span>
         </button>
 
         <div class="nav-category mt-3">Administration</div>
 
         <button type="button" class="sidebar-nav-item" data-tab="settings">
           <i class="lni lni-cog"></i>
-          <span>Security & Backups</span>
+          <span>Security &amp; Publishing</span>
         </button>
       </div>
 
@@ -533,81 +540,206 @@
              TAB 6: CONTACT & FOOTER
              =================================================================== -->
         <div id="tab-contact" class="admin-tab-pane" style="display:none;">
+
+          <!-- CONTACT -->
           <div class="content-card">
             <div class="content-card-header">
               <div>
-                <h3 class="content-card-title">Contact Channels & Footer Configuration</h3>
-                <p class="content-card-desc">Update official contact emails, phone numbers, social media handles, and footer copyright.</p>
+                <h3 class="content-card-title">Contact Section</h3>
+                <p class="content-card-desc">The heading, intro line, and contact details shown in the "Get in Touch" section.</p>
               </div>
             </div>
 
             <form id="contact-footer-form">
               <div class="form-row">
                 <div class="form-col admin-form-group">
+                  <label for="contact-title-input">Section Heading</label>
+                  <input type="text" id="contact-title-input" class="admin-form-control" placeholder="Get in Touch">
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="contact-subtitle-input">Section Intro Line</label>
+                  <input type="text" id="contact-subtitle-input" class="admin-form-control">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-col admin-form-group">
                   <label for="contact-email-input">Official Contact Email</label>
-                  <input type="email" id="contact-email-input" class="admin-form-control" required>
+                  <input type="email" id="contact-email-input" class="admin-form-control">
                 </div>
                 <div class="form-col admin-form-group">
                   <label for="contact-phone-input">Official Phone / WhatsApp</label>
-                  <input type="text" id="contact-phone-input" class="admin-form-control" required>
+                  <input type="text" id="contact-phone-input" class="admin-form-control">
                 </div>
               </div>
 
               <div class="admin-form-group">
                 <label for="contact-address-input">Headquarters / Location Address</label>
-                <input type="text" id="contact-address-input" class="admin-form-control" required>
-              </div>
-
-              <h4 class="mt-4 mb-3" style="font-size:15px; font-weight:700;">Social Media Links</h4>
-              <div class="form-row">
-                <div class="form-col admin-form-group">
-                  <label for="contact-fb-input"><i class="lni lni-facebook"></i> Facebook Page URL</label>
-                  <input type="url" id="contact-fb-input" class="admin-form-control">
-                </div>
-                <div class="form-col admin-form-group">
-                  <label for="contact-twitter-input"><i class="lni lni-twitter"></i> Twitter / X URL</label>
-                  <input type="url" id="contact-twitter-input" class="admin-form-control">
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-col admin-form-group">
-                  <label for="contact-insta-input"><i class="lni lni-instagram"></i> Instagram Handle URL</label>
-                  <input type="url" id="contact-insta-input" class="admin-form-control">
-                </div>
-                <div class="form-col admin-form-group">
-                  <label for="contact-linkedin-input"><i class="lni lni-linkedin"></i> LinkedIn Company URL</label>
-                  <input type="url" id="contact-linkedin-input" class="admin-form-control">
-                </div>
-              </div>
-
-              <h4 class="mt-4 mb-3" style="font-size:15px; font-weight:700;">Footer Text & Copyright</h4>
-              <div class="admin-form-group">
-                <label for="footer-about-input">Footer Bio / Summary</label>
-                <textarea id="footer-about-input" class="admin-form-control" required></textarea>
-              </div>
-
-              <div class="admin-form-group">
-                <label for="footer-copyright-input">Footer Copyright Notice</label>
-                <input type="text" id="footer-copyright-input" class="admin-form-control" required>
+                <input type="text" id="contact-address-input" class="admin-form-control">
               </div>
 
               <button type="submit" class="btn-save-section">
-                <i class="lni lni-checkmark"></i> Save Contact & Footer
+                <i class="lni lni-checkmark"></i> Save Contact Section
+              </button>
+            </form>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">Footer</h3>
+                <p class="content-card-desc">Everything in the dark footer bar: brand text, bio, social icons, link columns, the newsletter box, and the copyright line.</p>
+              </div>
+            </div>
+
+            <form id="footer-form">
+              <div class="form-row">
+                <div class="form-col admin-form-group">
+                  <label for="footer-brand-name-input">Footer Brand Name</label>
+                  <input type="text" id="footer-brand-name-input" class="admin-form-control" placeholder="The Bandhan Project">
+                </div>
+                <div class="form-col admin-form-group">
+                  <label for="footer-brand-tagline-input">Footer Brand Tagline</label>
+                  <input type="text" id="footer-brand-tagline-input" class="admin-form-control" placeholder="lean into Goodness">
+                </div>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="footer-about-input">Footer Bio / Summary</label>
+                <textarea id="footer-about-input" class="admin-form-control"></textarea>
+              </div>
+
+              <div class="admin-form-group">
+                <label for="footer-copyright-input">Copyright Line</label>
+                <input type="text" id="footer-copyright-input" class="admin-form-control">
+              </div>
+
+              <hr class="my-4">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                <h4 style="font-size:15px; font-weight:700; margin:0;">Social Icons</h4>
+                <button type="button" class="btn-secondary" id="btn-add-social" style="height:34px; font-size:12.5px;">
+                  <i class="lni lni-plus"></i> Add Social Link
+                </button>
+              </div>
+              <p class="content-card-desc mb-2">Pick a network for the icon, then paste the full URL. Leave the URL blank to hide that icon.</p>
+              <div id="footer-social-editor" class="repeater-list"></div>
+
+              <hr class="my-4">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                <h4 style="font-size:15px; font-weight:700; margin:0;">Footer Link Columns</h4>
+                <button type="button" class="btn-secondary" id="btn-add-footer-col" style="height:34px; font-size:12.5px;">
+                  <i class="lni lni-plus"></i> Add Column
+                </button>
+              </div>
+              <p class="content-card-desc mb-2">Each column has a heading and a list of links. A link can point to a section on this page (e.g. <code>#about</code>) or to any external URL.</p>
+              <div id="footer-columns-editor"></div>
+
+              <hr class="my-4">
+              <h4 style="font-size:15px; font-weight:700;" class="mb-2">Newsletter Sign-up Box</h4>
+              <label class="section-toggle" style="max-width:340px;">
+                <input type="checkbox" id="footer-show-subscribe"> <span>Show the newsletter sign-up box</span>
+              </label>
+              <div class="admin-form-group mt-3">
+                <label for="footer-subscribe-title-input">Box Heading</label>
+                <input type="text" id="footer-subscribe-title-input" class="admin-form-control" placeholder="Stay Updated">
+              </div>
+              <div class="admin-form-group">
+                <label for="footer-subscribe-text-input">Box Text</label>
+                <textarea id="footer-subscribe-text-input" class="admin-form-control"></textarea>
+              </div>
+
+              <button type="submit" class="btn-save-section">
+                <i class="lni lni-checkmark"></i> Save Footer
               </button>
             </form>
           </div>
         </div>
 
         <!-- ===================================================================
-             TAB 7: SECURITY & BACKUPS
+             TAB: NAVIGATION & LAYOUT
              =================================================================== -->
-        <div id="tab-settings" class="admin-tab-pane" style="display:none;">
+        <div id="tab-navlayout" class="admin-tab-pane" style="display:none;">
+
           <div class="content-card">
             <div class="content-card-header">
               <div>
-                <h3 class="content-card-title">Security & Passcode Settings</h3>
-                <p class="content-card-desc">Change your master admin passcode to protect access to the control panel.</p>
+                <h3 class="content-card-title">Top Navigation Menu</h3>
+                <p class="content-card-desc">Add, rename, reorder (&uarr; &darr;), or remove links in the header menu. A link is usually a section anchor such as <code>#about</code>, but it can be any URL (e.g. <code>https://…</code>).</p>
+              </div>
+              <button type="button" class="btn-admin-primary" id="btn-add-nav-item" style="width:auto; padding:0 18px; height:38px; font-size:13px;">
+                <i class="lni lni-plus"></i> Add Menu Item
+              </button>
+            </div>
+            <div id="nav-menu-editor" class="repeater-list"></div>
+            <button type="button" class="btn-save-section" id="btn-save-nav">
+              <i class="lni lni-checkmark"></i> Save Menu
+            </button>
+          </div>
+
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">Homepage Sections — Show / Hide</h3>
+                <p class="content-card-desc">Switch whole sections of the homepage on or off. Hidden sections disappear from the live page immediately after saving.</p>
+              </div>
+            </div>
+            <form id="sections-form">
+              <div class="section-toggle-grid">
+                <label class="section-toggle"><input type="checkbox" id="sec-about"> <span>About &amp; Impact Counters</span></label>
+                <label class="section-toggle"><input type="checkbox" id="sec-yknot"> <span>yKnot Project</span></label>
+                <label class="section-toggle"><input type="checkbox" id="sec-events"> <span>Events &amp; Drives (jigsaw)</span></label>
+                <label class="section-toggle"><input type="checkbox" id="sec-founder"> <span>Founder's Note</span></label>
+                <label class="section-toggle"><input type="checkbox" id="sec-gallery"> <span>Moments &amp; Gallery</span></label>
+                <label class="section-toggle"><input type="checkbox" id="sec-contact"> <span>Contact Form</span></label>
+              </div>
+              <button type="submit" class="btn-save-section mt-3">
+                <i class="lni lni-checkmark"></i> Save Section Visibility
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- ===================================================================
+             TAB 7: SECURITY & PUBLISHING
+             =================================================================== -->
+        <div id="tab-settings" class="admin-tab-pane" style="display:none;">
+
+          <!-- PUBLISH -->
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">Publish Your Changes</h3>
+                <p class="content-card-desc">Edits you save in this panel are stored only in <strong>this browser</strong>. To push them to the live website for every visitor, download the content file and replace <code>assets/js/content.js</code> in your hosting/repository, then deploy.</p>
+              </div>
+            </div>
+
+            <div id="draft-status" class="draft-status"></div>
+
+            <ol class="publish-steps">
+              <li>Make and <strong>Save</strong> your edits in the tabs on the left.</li>
+              <li>Click <strong>Download content.js</strong> below.</li>
+              <li>Replace <code>assets/js/content.js</code> with the downloaded file.</li>
+              <li>Deploy (push to Git, or re-upload the folder). Done — it's live.</li>
+            </ol>
+
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+              <button type="button" id="btn-export-publish" class="btn-admin-primary mb-2" style="width:auto; padding: 0 20px; height:42px; font-size:13.5px;">
+                <i class="lni lni-cloud-upload"></i> Download content.js for publishing
+              </button>
+              <button type="button" id="btn-discard-draft" class="btn-secondary mb-2" style="height:42px;">
+                <i class="lni lni-reload"></i> Discard local changes (revert to published)
+              </button>
+            </div>
+          </div>
+
+          <!-- PASSCODE -->
+          <div class="content-card">
+            <div class="content-card-header">
+              <div>
+                <h3 class="content-card-title">Admin Passcode</h3>
+                <p class="content-card-desc">Changes the passcode for this panel. <strong>This is light protection only</strong> — anyone can read it in the page source. For real access control, password-protect <code>/admin.html</code> at your host (see README).</p>
               </div>
             </div>
 
@@ -622,27 +754,24 @@
             </form>
           </div>
 
+          <!-- BACKUPS -->
           <div class="content-card">
             <div class="content-card-header">
               <div>
-                <h3 class="content-card-title">Data Backups, Export & Restore</h3>
-                <p class="content-card-desc">Download a complete JSON snapshot of the entire website or restore from a backup file.</p>
+                <h3 class="content-card-title">Backups &amp; Restore</h3>
+                <p class="content-card-desc">Download a full JSON snapshot for safe-keeping, or restore the site from a snapshot file.</p>
               </div>
             </div>
 
-            <div class="d-flex flex-wrap gap-3 align-items-center mb-3">
-              <button type="button" id="btn-export-json" class="btn-admin-primary mr-3 mb-2" style="width:auto; padding: 0 20px; height:42px; font-size:13.5px;">
-                <i class="lni lni-download"></i> Export Data Backup (JSON)
+            <div class="d-flex flex-wrap gap-3 align-items-center mb-1">
+              <button type="button" id="btn-export-json" class="btn-secondary mb-2" style="height: 42px;">
+                <i class="lni lni-download"></i> Export JSON backup
               </button>
 
-              <label class="btn-secondary mb-2 mr-3" style="margin: 0; height: 42px; display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
-                <i class="lni lni-upload"></i> Restore from JSON File
+              <label class="btn-secondary mb-2" style="margin: 0; height: 42px; display:inline-flex; align-items:center; gap:8px; cursor:pointer;">
+                <i class="lni lni-upload"></i> Restore from JSON file
                 <input type="file" id="import-json-file" accept=".json" style="display:none;">
               </label>
-
-              <button type="button" id="btn-reset-default" class="btn-secondary mb-2" style="color: #ef4444; border-color: #fecaca; background: #fff5f5; height: 42px;">
-                <i class="lni lni-reload"></i> Reset to Factory Preset
-              </button>
             </div>
           </div>
         </div>
@@ -762,6 +891,7 @@
   </div>
 
   <!-- Scripts -->
+  <script src="assets/js/content.js"></script>
   <script src="assets/js/site-data.js"></script>
   <script src="assets/js/admin.js"></script>
 </body>

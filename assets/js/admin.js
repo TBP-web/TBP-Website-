@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setVal('yknot-image-url', yk.image);
     updateImagePreview('yknot-img-preview', yk.image);
     const yknotActiveEl = document.getElementById('yknot-active');
-    if (yknotActiveEl) yknotActiveEl.checked = yk.active !== false;
+    if (yknotActiveEl) yknotActiveEl.checked = (data.sections || {}).yknot !== false;
 
     if (data.about.stats && data.about.stats.length >= 4) {
       setVal('stat-count-0', data.about.stats[0].count);
@@ -154,19 +154,45 @@ document.addEventListener('DOMContentLoaded', () => {
       setVal('founder-paras-input', data.founderNote.paragraphs.join('\n\n'));
     }
 
-    // 5. Contact & Footer Form
+    // 5. Contact Form
+    setVal('contact-title-input', data.contact.title);
+    setVal('contact-subtitle-input', data.contact.subtitle);
     setVal('contact-email-input', data.contact.email);
     setVal('contact-phone-input', data.contact.phone);
     setVal('contact-address-input', data.contact.address);
-    setVal('contact-fb-input', data.contact.facebook);
-    setVal('contact-twitter-input', data.contact.twitter);
-    setVal('contact-insta-input', data.contact.instagram);
-    setVal('contact-linkedin-input', data.contact.linkedin);
-    setVal('footer-about-input', data.footer.aboutText);
-    setVal('footer-copyright-input', data.footer.copyright);
 
-    // 6. Render Gallery Grid in Admin
+    // 6. Footer Form
+    const f = data.footer || {};
+    setVal('footer-brand-name-input', f.brandName);
+    setVal('footer-brand-tagline-input', f.brandTagline);
+    setVal('footer-about-input', f.aboutText);
+    setVal('footer-copyright-input', f.copyright);
+    setVal('footer-subscribe-title-input', f.subscribeTitle);
+    setVal('footer-subscribe-text-input', f.subscribeText);
+    const showSub = document.getElementById('footer-show-subscribe');
+    if (showSub) showSub.checked = f.showSubscribe !== false;
+    renderSocialEditor(Array.isArray(f.socials) ? f.socials : []);
+    renderFooterColumnsEditor(Array.isArray(f.columns) ? f.columns : []);
+
+    // 7. Navigation & Layout
+    renderNavEditor((data.navigation && Array.isArray(data.navigation.menu)) ? data.navigation.menu : []);
+    const sec = data.sections || {};
+    setChecked('sec-about', sec.about);
+    setChecked('sec-yknot', sec.yknot);
+    setChecked('sec-events', sec.events);
+    setChecked('sec-founder', sec.founder);
+    setChecked('sec-gallery', sec.gallery);
+    setChecked('sec-contact', sec.contact);
+
+    // 8. Render Gallery Grid in Admin
     renderAdminGallery(data.gallery || []);
+
+    updateDraftStatus();
+  }
+
+  function setChecked(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.checked = value !== false;
   }
 
   // =========================================================================
@@ -476,7 +502,8 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const data = dataManager.getData();
       data.yknot = data.yknot || {};
-      data.yknot.active = document.getElementById('yknot-active').checked;
+      data.sections = data.sections || {};
+      data.sections.yknot = document.getElementById('yknot-active').checked;
       data.yknot.badge = getVal('yknot-badge-input');
       data.yknot.title = getVal('yknot-title-input');
       data.yknot.subtitle = getVal('yknot-subtitle-input');
@@ -518,29 +545,276 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Contact & Footer Save
+  // Contact Section Save
   const contactForm = document.getElementById('contact-footer-form');
   if (contactForm) {
     contactForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const data = dataManager.getData();
+      data.contact.title = getVal('contact-title-input');
+      data.contact.subtitle = getVal('contact-subtitle-input');
       data.contact.email = getVal('contact-email-input');
       data.contact.phone = getVal('contact-phone-input');
       data.contact.address = getVal('contact-address-input');
-      data.contact.facebook = getVal('contact-fb-input');
-      data.contact.twitter = getVal('contact-twitter-input');
-      data.contact.instagram = getVal('contact-insta-input');
-      data.contact.linkedin = getVal('contact-linkedin-input');
+      persist(data, 'Contact section saved!');
+    });
+  }
+
+  // =========================================================================
+  // FOOTER (brand text, bio, socials, link columns, newsletter box)
+  // =========================================================================
+  const SOCIAL_PRESETS = [
+    { label: 'Facebook',    icon: 'lni-facebook-original' },
+    { label: 'Instagram',   icon: 'lni-instagram-original' },
+    { label: 'Twitter / X', icon: 'lni-twitter-original' },
+    { label: 'LinkedIn',    icon: 'lni-linkedin-original' },
+    { label: 'YouTube',     icon: 'lni-youtube' },
+    { label: 'WhatsApp',    icon: 'lni-whatsapp' },
+    { label: 'Telegram',    icon: 'lni-telegram-original' },
+    { label: 'Pinterest',   icon: 'lni-pinterest' },
+    { label: 'Email',       icon: 'lni-envelope' },
+    { label: 'Website',     icon: 'lni-world' }
+  ];
+
+  function socialOptions(selectedIcon) {
+    return SOCIAL_PRESETS.map(p =>
+      `<option value="${p.icon}" ${p.icon === selectedIcon ? 'selected' : ''}>${p.label}</option>`
+    ).join('');
+  }
+
+  function renderSocialEditor(socials) {
+    const box = document.getElementById('footer-social-editor');
+    if (!box) return;
+    box.innerHTML = (socials.length ? socials : []).map(s => socialRowHtml(s)).join('');
+  }
+
+  function socialRowHtml(s) {
+    s = s || {};
+    return `<div class="repeater-row" data-id="${attr(s.id || ('soc_' + rid()))}">
+      <select class="admin-form-control rp-icon" style="flex:0 0 150px;">${socialOptions(s.icon || 'lni-link')}</select>
+      <input type="text" class="admin-form-control rp-url" placeholder="https://…" value="${attr(s.url)}">
+      <button type="button" class="rp-remove" title="Remove"><i class="lni lni-trash"></i></button>
+    </div>`;
+  }
+
+  function collectSocials() {
+    return [...document.querySelectorAll('#footer-social-editor .repeater-row')].map(row => {
+      const icon = row.querySelector('.rp-icon').value;
+      const preset = SOCIAL_PRESETS.find(p => p.icon === icon);
+      return {
+        id: row.dataset.id || ('soc_' + rid()),
+        label: preset ? preset.label : 'Social',
+        icon: icon,
+        url: row.querySelector('.rp-url').value.trim()
+      };
+    });
+  }
+
+  const addSocialBtn = document.getElementById('btn-add-social');
+  if (addSocialBtn) {
+    addSocialBtn.addEventListener('click', () => {
+      document.getElementById('footer-social-editor').insertAdjacentHTML('beforeend', socialRowHtml({ icon: 'lni-facebook-original' }));
+    });
+  }
+
+  function renderFooterColumnsEditor(columns) {
+    const box = document.getElementById('footer-columns-editor');
+    if (!box) return;
+    box.innerHTML = columns.map(col => footerColBlockHtml(col)).join('');
+  }
+
+  function footerColBlockHtml(col) {
+    col = col || {};
+    const links = Array.isArray(col.links) ? col.links : [];
+    return `<div class="footer-col-block" data-id="${attr(col.id || ('fcol_' + rid()))}">
+      <div class="fcol-head">
+        <input type="text" class="admin-form-control fcol-title" placeholder="Column heading" value="${attr(col.title)}">
+        <button type="button" class="rp-remove-col" title="Remove whole column"><i class="lni lni-trash"></i></button>
+      </div>
+      <div class="fcol-links">
+        ${links.map(l => footerLinkRowHtml(l)).join('')}
+      </div>
+      <button type="button" class="btn-inline-add btn-add-fcol-link"><i class="lni lni-plus"></i> Add link</button>
+    </div>`;
+  }
+
+  function footerLinkRowHtml(l) {
+    l = l || {};
+    return `<div class="repeater-row" data-id="${attr(l.id || ('flink_' + rid()))}">
+      <input type="text" class="admin-form-control fl-label" placeholder="Link text" value="${attr(l.label)}">
+      <input type="text" class="admin-form-control fl-url" placeholder="#about or https://…" value="${attr(l.url)}">
+      <button type="button" class="rp-remove" title="Remove link"><i class="lni lni-trash"></i></button>
+    </div>`;
+  }
+
+  function collectFooterColumns() {
+    return [...document.querySelectorAll('#footer-columns-editor .footer-col-block')].map(block => ({
+      id: block.dataset.id || ('fcol_' + rid()),
+      title: block.querySelector('.fcol-title').value.trim(),
+      links: [...block.querySelectorAll('.fcol-links .repeater-row')].map(row => ({
+        id: row.dataset.id || ('flink_' + rid()),
+        label: row.querySelector('.fl-label').value.trim(),
+        url: row.querySelector('.fl-url').value.trim() || '#'
+      })).filter(l => l.label)
+    })).filter(c => c.title || c.links.length);
+  }
+
+  const addFooterColBtn = document.getElementById('btn-add-footer-col');
+  if (addFooterColBtn) {
+    addFooterColBtn.addEventListener('click', () => {
+      document.getElementById('footer-columns-editor').insertAdjacentHTML('beforeend',
+        footerColBlockHtml({ title: 'New Column', links: [{ label: 'New link', url: '#' }] }));
+    });
+  }
+
+  // Delegated remove / add-link buttons inside the footer editors
+  document.addEventListener('click', (e) => {
+    const rm = e.target.closest('.rp-remove');
+    if (rm && rm.closest('#footer-social-editor, #footer-columns-editor, #nav-menu-editor')) {
+      rm.closest('.repeater-row').remove();
+      return;
+    }
+    const rmCol = e.target.closest('.rp-remove-col');
+    if (rmCol) {
+      rmCol.closest('.footer-col-block').remove();
+      return;
+    }
+    const addLink = e.target.closest('.btn-add-fcol-link');
+    if (addLink) {
+      addLink.closest('.footer-col-block').querySelector('.fcol-links')
+        .insertAdjacentHTML('beforeend', footerLinkRowHtml({ label: '', url: '#' }));
+    }
+  });
+
+  const footerForm = document.getElementById('footer-form');
+  if (footerForm) {
+    footerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = dataManager.getData();
+      data.footer = data.footer || {};
+      data.footer.brandName = getVal('footer-brand-name-input');
+      data.footer.brandTagline = getVal('footer-brand-tagline-input');
       data.footer.aboutText = getVal('footer-about-input');
       data.footer.copyright = getVal('footer-copyright-input');
-
-      const res = dataManager.saveData(data);
-      if (res && res.success === false) {
-        showToast('Storage error: ' + res.error, 'error');
-      } else {
-        showToast('Contact and footer details saved live!', 'success');
-      }
+      data.footer.showSubscribe = document.getElementById('footer-show-subscribe').checked;
+      data.footer.subscribeTitle = getVal('footer-subscribe-title-input');
+      data.footer.subscribeText = getVal('footer-subscribe-text-input');
+      data.footer.socials = collectSocials();
+      data.footer.columns = collectFooterColumns();
+      persist(data, 'Footer saved!');
     });
+  }
+
+  // =========================================================================
+  // NAVIGATION MENU + SECTION VISIBILITY
+  // =========================================================================
+  function renderNavEditor(menu) {
+    const box = document.getElementById('nav-menu-editor');
+    if (!box) return;
+    box.innerHTML = menu.map(item => navRowHtml(item)).join('');
+  }
+
+  function navRowHtml(item) {
+    item = item || {};
+    return `<div class="repeater-row" data-id="${attr(item.id || ('nav_' + rid()))}">
+      <button type="button" class="rp-move-up" title="Move up" style="flex:0 0 auto;width:34px;height:38px;border:1px solid #e2e8f0;background:#fff;border-radius:8px;cursor:pointer;">&uarr;</button>
+      <button type="button" class="rp-move-down" title="Move down" style="flex:0 0 auto;width:34px;height:38px;border:1px solid #e2e8f0;background:#fff;border-radius:8px;cursor:pointer;">&darr;</button>
+      <input type="text" class="admin-form-control rp-label" placeholder="Menu label" value="${attr(item.label)}">
+      <input type="text" class="admin-form-control rp-link" placeholder="#about or https://…" value="${attr(item.link)}">
+      <button type="button" class="rp-remove" title="Remove"><i class="lni lni-trash"></i></button>
+    </div>`;
+  }
+
+  function collectNavMenu() {
+    return [...document.querySelectorAll('#nav-menu-editor .repeater-row')].map(row => ({
+      id: row.dataset.id || ('nav_' + rid()),
+      label: row.querySelector('.rp-label').value.trim(),
+      link: row.querySelector('.rp-link').value.trim() || '#'
+    })).filter(x => x.label);
+  }
+
+  const addNavBtn = document.getElementById('btn-add-nav-item');
+  if (addNavBtn) {
+    addNavBtn.addEventListener('click', () => {
+      document.getElementById('nav-menu-editor').insertAdjacentHTML('beforeend', navRowHtml({ label: 'New Item', link: '#' }));
+    });
+  }
+
+  // Move up / down inside the nav editor
+  const navEditor = document.getElementById('nav-menu-editor');
+  if (navEditor) {
+    navEditor.addEventListener('click', (e) => {
+      const up = e.target.closest('.rp-move-up');
+      const down = e.target.closest('.rp-move-down');
+      if (!up && !down) return;
+      const row = e.target.closest('.repeater-row');
+      if (up && row.previousElementSibling) row.parentNode.insertBefore(row, row.previousElementSibling);
+      if (down && row.nextElementSibling) row.parentNode.insertBefore(row.nextElementSibling, row);
+    });
+  }
+
+  const saveNavBtn = document.getElementById('btn-save-nav');
+  if (saveNavBtn) {
+    saveNavBtn.addEventListener('click', () => {
+      const data = dataManager.getData();
+      data.navigation = data.navigation || {};
+      data.navigation.menu = collectNavMenu();
+      persist(data, 'Navigation menu saved!');
+    });
+  }
+
+  const sectionsForm = document.getElementById('sections-form');
+  if (sectionsForm) {
+    sectionsForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = dataManager.getData();
+      data.sections = data.sections || {};
+      data.sections.about = document.getElementById('sec-about').checked;
+      data.sections.yknot = document.getElementById('sec-yknot').checked;
+      data.sections.events = document.getElementById('sec-events').checked;
+      data.sections.founder = document.getElementById('sec-founder').checked;
+      data.sections.gallery = document.getElementById('sec-gallery').checked;
+      data.sections.contact = document.getElementById('sec-contact').checked;
+      persist(data, 'Section visibility saved!');
+      // keep the yKnot-tab checkbox in sync
+      const yk = document.getElementById('yknot-active');
+      if (yk) yk.checked = data.sections.yknot;
+    });
+  }
+
+  // Shared save helper
+  function persist(data, successMsg) {
+    const res = dataManager.saveData(data);
+    if (res && res.success === false) {
+      showToast('Storage error: ' + res.error, 'error');
+    } else {
+      showToast(successMsg, 'success');
+      updateDraftStatus();
+    }
+  }
+
+  function rid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  }
+
+  function attr(v) {
+    return (v == null ? '' : String(v))
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function updateDraftStatus() {
+    const el = document.getElementById('draft-status');
+    if (!el) return;
+    if (dataManager.hasLocalDraft()) {
+      el.className = 'draft-status dirty';
+      el.innerHTML = '<i class="lni lni-warning"></i> You have unpublished changes in this browser. Download <code>content.js</code> below and deploy it to make them live.';
+    } else {
+      el.className = 'draft-status clean';
+      el.innerHTML = '<i class="lni lni-checkmark-circle"></i> Nothing to publish — this browser matches the published site.';
+    }
   }
 
   // Gallery Manager
@@ -617,20 +891,50 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function downloadFile(filename, text, mime) {
+    const blob = new Blob([text], { type: mime || 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   const exportBtn = document.getElementById('btn-export-json');
   if (exportBtn) {
     exportBtn.addEventListener('click', () => {
-      const json = dataManager.exportDataJson();
-      const blob = new Blob([json], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `the-bandhan-project-backup-${new Date().toISOString().slice(0, 10)}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showToast('Backup JSON exported successfully!', 'success');
+      downloadFile(
+        `the-bandhan-project-backup-${new Date().toISOString().slice(0, 10)}.json`,
+        dataManager.exportDataJson(),
+        'application/json'
+      );
+      showToast('Backup JSON exported.', 'success');
+    });
+  }
+
+  const publishBtn = document.getElementById('btn-export-publish');
+  if (publishBtn) {
+    publishBtn.addEventListener('click', () => {
+      downloadFile('content.js', dataManager.exportPublishFile(), 'text/javascript');
+      showToast('content.js downloaded. Replace assets/js/content.js and deploy.', 'success');
+    });
+  }
+
+  const discardBtn = document.getElementById('btn-discard-draft');
+  if (discardBtn) {
+    discardBtn.addEventListener('click', () => {
+      if (!dataManager.hasLocalDraft()) {
+        showToast('There are no local changes to discard.', 'info');
+        return;
+      }
+      if (confirm('Discard all unpublished changes in this browser and show the currently published content?')) {
+        dataManager.clearDraft();
+        loadAllSectionData();
+        showToast('Local changes discarded.', 'success');
+      }
     });
   }
 
@@ -651,17 +955,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       };
       reader.readAsText(file);
-    });
-  }
-
-  const resetBtn = document.getElementById('btn-reset-default');
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      if (confirm('Are you sure you want to reset all content to default preset?')) {
-        dataManager.resetToDefault();
-        loadAllSectionData();
-        showToast('Reset all data to default brand preset.', 'success');
-      }
     });
   }
 

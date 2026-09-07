@@ -71,24 +71,14 @@
 
                             <div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
                                 <ul id="nav" class="navbar-nav ml-auto align-items-lg-center">
-                                    <li class="nav-item active">
-                                        <a class="page-scroll" href="#home">Home</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="page-scroll" href="#about">About</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="page-scroll" href="#events">Events</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="page-scroll" href="#founder-note">Founder's Note</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="page-scroll" href="#gallery">Gallery</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="page-scroll" href="#contact">Contact</a>
-                                    </li>
+                                    <!-- Rendered from navigation.menu by render-site.js -->
+                                    <li class="nav-item active"><a class="page-scroll" href="#home">Home</a></li>
+                                    <li class="nav-item"><a class="page-scroll" href="#about">About</a></li>
+                                    <li class="nav-item"><a class="page-scroll" href="#yknot">yKnot</a></li>
+                                    <li class="nav-item"><a class="page-scroll" href="#events">Events</a></li>
+                                    <li class="nav-item"><a class="page-scroll" href="#founder-note">Founder's Note</a></li>
+                                    <li class="nav-item"><a class="page-scroll" href="#gallery">Gallery</a></li>
+                                    <li class="nav-item"><a class="page-scroll" href="#contact">Contact</a></li>
                                 </ul>
                             </div> <!-- navbar collapse -->
                         </nav> <!-- navbar -->
@@ -357,45 +347,25 @@
                             <a href="index.html" class="d-inline-flex align-items-center gap-2 mb-3 text-white text-decoration-none">
                                 <img src="assets/images/logo.png" alt="The Bandhan Project" class="brand-logo-img tbp-brand-logo" style="height: 48px; background:#fff; padding:4px; border-radius:8px;">
                                 <div style="margin-left:10px;">
-                                    <span style="font-size:20px; font-weight:700; color:#fff; display:block; line-height:1.2;">The Bandhan Project</span>
-                                    <small style="color:#93c5fd; font-size:12px; font-weight:500;">lean into Goodness</small>
+                                    <span id="footer-brand-name" style="font-size:20px; font-weight:700; color:#fff; display:block; line-height:1.2;">The Bandhan Project</span>
+                                    <small id="footer-brand-tagline" style="color:#93c5fd; font-size:12px; font-weight:500;">lean into Goodness</small>
                                 </div>
                             </a>
                             <p id="footer-about-text">The Bandhan Project (tbp;) — Founded by Harsh Bhayani. Dedicated to creating lasting community bonds, leadership forums, impactful social initiatives, and inspiring communities to lean into Goodness.</p>
-                            <ul class="social">
-                                <li><a class="social_1" href="javascript:void(0)" aria-label="Facebook"><i class="lni lni-facebook-original"></i></a></li>
-                                <li><a class="social_2" href="javascript:void(0)" aria-label="Twitter"><i class="lni lni-twitter-original"></i></a></li>
-                                <li><a class="social_3" href="javascript:void(0)" aria-label="Instagram"><i class="lni lni-instagram-original"></i></a></li>
-                                <li><a class="social_4" href="javascript:void(0)" aria-label="LinkedIn"><i class="lni lni-linkedin-original"></i></a></li>
+                            <ul class="social" id="footer-social-list">
+                                <!-- Rendered from footer.socials by render-site.js -->
                             </ul>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-12 order-md-3 order-lg-2">
-                        <div class="footer_link_wrapper d-flex flex-wrap">
-                            <div class="footer_link mt-45">
-                                <h4 class="footer_title">Quick Navigation</h4>
-                                <ul class="link">
-                                    <li><a href="#home">Home</a></li>
-                                    <li><a href="#about">About Us</a></li>
-                                    <li><a href="#events">Past Events</a></li>
-                                    <li><a href="#founder-note">Founder's Note</a></li>
-                                    <li><a href="#gallery">Gallery</a></li>
-                                </ul>
-                            </div>
-                            <div class="footer_link mt-45">
-                                <h4 class="footer_title">Community & Support</h4>
-                                <ul class="link">
-                                    <li><a href="#contact">Contact Us</a></li>
-                                    <li><a href="#about">Our Mission & Impact</a></li>
-                                    <li><a href="#founder-note">Letter from Harsh Bhayani</a></li>
-                                </ul>
-                            </div>
+                        <div class="footer_link_wrapper d-flex flex-wrap" id="footer-columns">
+                            <!-- Rendered from footer.columns by render-site.js -->
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6 order-md-2 order-lg-3">
+                    <div class="col-lg-4 col-md-6 order-md-2 order-lg-3" id="footer-subscribe-block">
                         <div class="footer_subscribe mt-45">
-                            <h4 class="footer_title">Stay Updated</h4>
-                            <p>Subscribe to receive announcements for new drives and initiatives from The Bandhan Project.</p>
+                            <h4 class="footer_title" id="footer-subscribe-title">Stay Updated</h4>
+                            <p id="footer-subscribe-text">Subscribe to receive announcements for new drives and initiatives from The Bandhan Project.</p>
                             <div class="subscribe_form">
                                 <form action="javascript:void(0)" onsubmit="alert('Thank you for subscribing to The Bandhan Project updates!'); this.reset();">
                                     <input type="email" placeholder="Enter your email" required>
@@ -420,11 +390,12 @@
     <script src="assets/js/vendor/jquery-1.12.4.min.js"></script>
     <script src="assets/js/popper.min.js"></script>
     <script src="assets/js/bootstrap.4.5.2.min.js"></script>
-    <script src="assets/js/jquery.easing.min.js"></script>
-    <script src="assets/js/scrolling-nav.js"></script>
     <script src="assets/js/waypoints.min.js"></script>
     <script src="assets/js/jquery.counterup.min.js"></script>
     <script src="assets/js/jquery.nice-select.min.js"></script>
+
+    <!--====== CMS: published content, then the data store, then the renderer ======-->
+    <script src="assets/js/content.js"></script>
     <script src="assets/js/site-data.js"></script>
     <script src="assets/js/render-site.js"></script>
     <script src="assets/js/main.js"></script>
