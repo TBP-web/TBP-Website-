@@ -1,0 +1,47 @@
+# The Bandhan Project (tbp;) — Apache config for GoDaddy / cPanel shared hosting.
+# (Netlify and Cloudflare Pages ignore this file — they use _headers / netlify.toml.)
+
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Pretty URL for the admin panel: /admin -> /admin.html
+  RewriteRule ^admin/?$ /admin.html [L]
+
+  # --- Force HTTPS -------------------------------------------------------
+  # Leave this commented out until your SSL certificate is active in cPanel
+  # (cPanel -> "SSL/TLS Status" -> Run AutoSSL). Then remove the two #'s.
+  # RewriteCond %{HTTPS} !=on
+  # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Serve the branded not-found page
+ErrorDocument 404 /404.html
+
+<IfModule mod_headers.c>
+  # Security headers
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Cache static assets for a day
+  <FilesMatch "\.(css|js|jpg|jpeg|png|gif|svg|webp|woff|woff2|ttf|eot|ico)$">
+    Header set Cache-Control "public, max-age=86400"
+  </FilesMatch>
+
+  # ...but always revalidate HTML and the published content file so edits
+  # appear quickly for returning visitors.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  <Files "content.js">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </Files>
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType text/javascript .js
+  AddType image/svg+xml .svg
+  AddType font/woff2 .woff2
+</IfModule>
